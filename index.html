@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Multi-AI Hub (മലയാളം)</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#0d1117">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Multi-AI">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<style>
+  :root {
+    --bg: #0d1117; --card: #161b22; --card2: #1f2631; --border: #30363d;
+    --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff; --user-bg: #1f3a5f;
+    --green: #3fb950; --red: #f85149; --gold: #d29922;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.65;
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  header {
+    flex-shrink: 0; background: rgba(13, 17, 23, 0.96);
+    border-bottom: 1px solid var(--border); padding: 10px 14px;
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  }
+  .logo { font-size: 1.05rem; font-weight: 700; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .logo span { color: var(--accent); }
+  .header-actions { display: flex; gap: 6px; flex-wrap: nowrap; }
+  .icon-btn {
+    background: var(--card2); color: var(--text); border: 1px solid var(--border);
+    padding: 6px 10px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; white-space: nowrap;
+  }
+  .icon-btn.primary { background: rgba(88,166,255,0.15); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+  .icon-btn:active { opacity: 0.7; }
+  .top-controls {
+    flex-shrink: 0; background: var(--card); border-bottom: 1px solid var(--border);
+    padding: 8px 14px; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;
+  }
+  .models-bar { display: flex; flex-wrap: wrap; gap: 6px; }
+  .model-chip {
+    display: flex; align-items: center; gap: 5px; background: var(--bg);
+    border: 1px solid var(--border); padding: 4px 9px; border-radius: 16px;
+    font-size: 0.78rem; cursor: pointer; user-select: none;
+  }
+  .model-chip input { accent-color: var(--accent); }
+  .model-chip.active { border-color: var(--accent); background: rgba(88,166,255,0.12); }
+  .meta-controls { display: flex; align-items: center; gap: 10px; font-size: 0.78rem; color: var(--muted); flex-wrap: wrap; }
+  .synth-select { background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 4px 6px; font-size: 0.78rem; }
+  #chatThread { flex: 1; overflow-y: auto; padding: 16px 14px 24px; width: 100%; max-width: 960px; margin: 0 auto; scroll-behavior: smooth; }
+  .empty-state { text-align: center; padding: 60px 16px; color: var(--muted); }
+  .empty-state h2 { color: var(--text); font-size: 1.25rem; margin-bottom: 8px; }
+  .empty-state p { font-size: 0.9rem; max-width: 440px; margin: 0 auto; }
+  .turn-block { margin-bottom: 24px; }
+  .user-row { display: flex; justify-content: flex-end; margin-bottom: 12px; }
+  .user-bubble {
+    background: var(--user-bg); border: 1px solid rgba(88,166,255,0.35); color: var(--text);
+    padding: 10px 14px; border-radius: 14px 14px 4px 14px; max-width: 86%;
+    font-size: 0.95rem; white-space: pre-wrap; word-wrap: break-word;
+  }
+  .final-card {
+    background: linear-gradient(180deg, rgba(88,166,255,0.08), var(--card));
+    border: 1px solid rgba(88,166,255,0.55); border-radius: 14px; padding: 14px;
+  }
+  .card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px; }
+  .card-title { font-weight: 700; font-size: 0.92rem; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .badge { font-size: 0.7rem; padding: 2px 7px; border-radius: 10px; background: var(--card2); color: var(--muted); border: 1px solid var(--border); font-weight: 500; }
+  .badge.loading { color: var(--gold); border-color: var(--gold); }
+  .badge.done { color: var(--green); border-color: var(--green); }
+  .badge.fail { color: var(--red); border-color: var(--red); }
+  .copy-btn { background: transparent; color: var(--muted); border: 1px solid var(--border); border-radius: 6px; padding: 3px 8px; font-size: 0.74rem; cursor: pointer; }
+  .models-details { margin-top: 10px; border: 1px solid var(--border); border-radius: 12px; background: rgba(22, 27, 34, 0.65); overflow: hidden; }
+  .models-details summary { padding: 9px 12px; font-size: 0.82rem; color: var(--muted); cursor: pointer; user-select: none; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+  .models-details summary::-webkit-details-marker { display: none; }
+  .models-details[open] summary { border-bottom: 1px solid var(--border); color: var(--text); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 10px; padding: 10px; }
+  .ai-card { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; }
+  .ai-body { font-size: 0.92rem; color: var(--text); word-wrap: break-word; }
+  .ai-card .ai-body { max-height: 320px; overflow-y: auto; font-size: 0.87rem; }
+  .ai-body pre { background: #090d13; padding: 10px; border-radius: 8px; overflow-x: auto; margin: 8px 0; border: 1px solid var(--border); font-size: 0.82rem; line-height: 1.45; }
+  .ai-body code { background: rgba(110,118,129,0.25); padding: 1px 5px; border-radius: 4px; font-family: monospace; font-size: 0.84rem; }
+  .ai-body pre code { background: transparent; padding: 0; }
+  .ai-body h3, .ai-body h4 { margin: 10px 0 4px; color: var(--accent); font-size: 0.98rem; }
+  .ai-body ul { padding-left: 20px; margin: 6px 0; }
+  .ai-body li { margin-bottom: 3px; }
+  .skeleton { color: var(--muted); font-style: italic; font-size: 0.86rem; }
+  .composer-bar { flex-shrink: 0; background: var(--card); border-top: 1px solid var(--border); padding: 10px 12px; }
+  .composer-inner { max-width: 960px; margin: 0 auto; display: flex; align-items: flex-end; gap: 8px; }
+  #promptInput {
+    flex: 1; background: var(--bg); color: var(--text); border: 1px solid var(--border);
+    border-radius: 12px; padding: 10px 12px; font-size: 0.96rem; font-family: inherit;
+    resize: none; min-height: 44px; max-height: 140px; outline: none; line-height: 1.45;
+  }
+  #promptInput:focus { border-color: var(--accent); }
+  .send-btn { background: var(--accent); color: #0d1117; border: none; border-radius: 12px; padding: 0 18px; height: 44px; font-weight: 700; font-size: 0.9rem; cursor: pointer; flex-shrink: 0; }
+  .send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .context-hint { max-width: 960px; margin: 4px auto 0; font-size: 0.72rem; color: var(--muted); display: flex; justify-content: space-between; }
+  #loginScreen { position: fixed; inset: 0; z-index: 100; background: var(--bg); display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .login-box { width: 100%; max-width: 360px; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 24px; text-align: center; }
+  .login-box h2 { margin-bottom: 6px; font-size: 1.25rem; }
+  .login-box p { color: var(--muted); font-size: 0.84rem; margin-bottom: 16px; }
+  .input-field { width: 100%; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 10px; padding: 11px; font-size: 0.95rem; margin-bottom: 10px; outline: none; }
+  .input-field:focus { border-color: var(--accent); }
+  .btn-primary { width: 100%; background: var(--accent); color: #0d1117; border: none; border-radius: 10px; padding: 11px; font-size: 0.94rem; font-weight: 700; cursor: pointer; }
+  .btn-primary:disabled { opacity: 0.5; }
+  .err-msg { color: var(--red); font-size: 0.84rem; margin-top: 10px; min-height: 20px; }
+  .modal-bg { position: fixed; inset: 0; z-index: 90; background: rgba(0,0,0,0.75); display: none; align-items: center; justify-content: center; padding: 14px; }
+  .modal { width: 100%; max-width: 520px; max-height: 86vh; overflow-y: auto; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+  .modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+  .field-label { display: block; font-size: 0.78rem; color: var(--muted); margin: 8px 0 4px; }
+  .preset-row { display: flex; gap: 8px; margin-bottom: 10px; }
+  .preset-btn { flex: 1; background: var(--card2); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 8px; font-size: 0.8rem; cursor: pointer; }
+  .history-item { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .history-item.active-chat { border-color: var(--accent); }
+  .history-main { flex: 1; cursor: pointer; min-width: 0; }
+  .history-q { font-weight: 600; font-size: 0.88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .history-meta { font-size: 0.74rem; color: var(--muted); margin-top: 2px; }
+  .del-btn { background: transparent; border: none; color: var(--muted); font-size: 0.95rem; cursor: pointer; padding: 4px 6px; }
+  .del-btn:hover { color: var(--red); }
+  #toast { position: fixed; bottom: 84px; left: 50%; transform: translateX(-50%); background: #238636; color: #fff; padding: 7px 14px; border-radius: 20px; font-size: 0.82rem; display: none; z-index: 120; }
+</style>
+</head>
+<body>
+
+<div id="loginScreen">
+  <div class="login-box">
+    <h2>Multi-AI Hub</h2>
+    <p>തുടരാൻ നിങ്ങളുടെ Worker URL & PIN നൽകുക</p>
+    <input type="url" id="loginWorkerUrl" class="input-field" placeholder="https://multi-ai-proxy.....workers.dev">
+    <input type="password" id="loginPin" class="input-field" placeholder="PIN / Password">
+    <button class="btn-primary" id="loginBtn" onclick="doLogin()">പ്രവേശിക്കുക</button>
+    <div class="err-msg" id="loginErr"></div>
+  </div>
+</div>
+
+<header>
+  <div class="logo">Multi-AI <span>Hub</span></div>
+  <div class="header-actions">
+    <button class="icon-btn primary" onclick="startNewChat()">+ പുതിയത്</button>
+    <button class="icon-btn" onclick="openHistory()">ചാറ്റുകൾ</button>
+    <button class="icon-btn" onclick="openSettings()">സെറ്റിംഗ്സ്</button>
+    <button class="icon-btn" onclick="logout()">ലോക്ക്</button>
+  </div>
+</header>
+
+<div class="top-controls">
+  <div class="models-bar" id="modelsBar"></div>
+  <div class="meta-controls">
+    <div style="display:flex;align-items:center;gap:5px;">
+      <span>സംഗ്രഹം:</span>
+      <select id="synthModelSelect" class="synth-select"></select>
+    </div>
+    <label style="display:flex;align-items:center;gap:4px;cursor:pointer;color:var(--text);">
+      <input type="checkbox" id="mlOnlyToggle" checked style="accent-color:var(--accent);"> മലയാളം മാത്രം
+    </label>
+  </div>
+</div>
+
+<main id="chatThread"></main>
+
+<div class="composer-bar">
+  <div class="composer-inner">
+    <textarea id="promptInput" rows="1" placeholder="മലയാളത്തിലോ മംഗ്ലീഷിലോ ചോദിക്കൂ..."></textarea>
+    <button class="send-btn" id="sendBtn" onclick="sendMessage()">അയക്കുക</button>
+  </div>
+  <div class="context-hint">
+    <span id="contextStatus">പുതിയ ചാറ്റ് • പഴയ മെമ്മറി ഒന്നുമില്ല</span>
+    <span id="turnCounter"></span>
+  </div>
+</div>
+
+<div class="modal-bg" id="settingsModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>സെറ്റിംഗ്സ് & മോഡൽ ID-കൾ</h3>
+      <button class="icon-btn" onclick="closeModal('settingsModal')">✕</button>
+    </div>
+    <label class="field-label">Cloudflare Worker URL</label>
+    <input type="url" id="setWorkerUrl" class="input-field">
+    <div class="preset-row">
+      <button class="preset-btn" onclick="applyPreset('paid')">Paid മോഡലുകൾ</button>
+      <button class="preset-btn" onclick="applyPreset('free')">Free ടെസ്റ്റ് മോഡലുകൾ</button>
+    </div>
+    <div id="modelSettingsInputs"></div>
+    <p style="font-size:0.75rem;color:var(--muted);margin-bottom:12px;">
+      * openrouter.ai/models നോക്കി ഏറ്റവും പുതിയ Model ID ഇവിടെ അപ്‌ഡേറ്റ് ചെയ്യാം.
+    </p>
+    <button class="btn-primary" onclick="saveSettings()">സേവ് ചെയ്യുക</button>
+  </div>
+</div>
+
+<div class="modal-bg" id="historyModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>പഴയ ചാറ്റുകൾ</h3>
+      <div style="display:flex;gap:8px;">
+        <button class="icon-btn" style="color:var(--red)" onclick="clearAllSessions()">എല്ലാം മായ്ക്കുക</button>
+        <button class="icon-btn" onclick="closeModal('historyModal')">✕</button>
+      </div>
+    </div>
+    <div id="historyList"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const DEFAULT_WORKER_URL = "https://multi-ai-proxy.shamsushaz14.workers.dev";
+const MAX_CONTEXT_TURNS = 6;
+const MAX_SAVED_SESSIONS = 30;
+
+const PRESETS = {
+  paid: [
+    { key: "claude",   name: "Claude",   id: "anthropic/claude-sonnet-4", enabled: true },
+    { key: "gemini",   name: "Gemini",   id: "google/gemini-2.5-pro",     enabled: true },
+    { key: "chatgpt",  name: "ChatGPT",  id: "openai/gpt-4o",             enabled: true },
+    { key: "grok",     name: "Grok",     id: "x-ai/grok-3",               enabled: true },
+    { key: "deepseek", name: "DeepSeek", id: "deepseek/deepseek-chat",    enabled: true }
+  ],
+  free: [
+    { key: "claude",   name: "Llama Free",    id: "meta-llama/llama-3.3-70b-instruct:free",        enabled: true },
+    { key: "gemini",   name: "Gemini Free",   id: "google/gemini-2.0-flash-exp:free",              enabled: true },
+    { key: "chatgpt",  name: "Qwen Free",     id: "qwen/qwen-2.5-72b-instruct:free",               enabled: true },
+    { key: "grok",     name: "Mistral Free",  id: "mistralai/mistral-small-3.1-24b-instruct:free", enabled: true },
+    { key: "deepseek", name: "DeepSeek Free", id: "deepseek/deepseek-r1:free",                     enabled: true }
+  ]
+};
+
+function cloneObj(o) { return JSON.parse(JSON.stringify(o)); }
+
+let state = {
+  workerUrl: localStorage.getItem("mai_worker") || DEFAULT_WORKER_URL,
+  pin: localStorage.getItem("mai_pin") || "",
+  models: JSON.parse(localStorage.getItem("mai_models") || "null") || cloneObj(PRESETS.free),
+  sessions: JSON.parse(localStorage.getItem("mai_sessions_v2") || "[]"),
+  currentSessionId: null,
+  isRunning: false
+};
+
+window.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("loginWorkerUrl").value = state.workerUrl;
+  if (state.pin && state.workerUrl) {
+    document.getElementById("loginScreen").style.display = "none";
+  }
+  renderModelChips();
+  if (state.sessions.length > 0) state.currentSessionId = state.sessions[0].id;
+  else createFreshSession();
+  renderChatThread();
+
+  const ta = document.getElementById("promptInput");
+  ta.addEventListener("input", () => {
+    ta.style.height = "auto";
+    ta.style.height = Math.min(ta.scrollHeight, 140) + "px";
+  });
+  ta.addEventListener("keydown", (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") { e.preventDefault(); sendMessage(); }
+  });
+});
+
+function getCurrentSession() {
+  let s = state.sessions.find(x => x.id === state.currentSessionId);
+  if (!s) s = createFreshSession();
+  return s;
+}
+function createFreshSession() {
+  const s = { id: "chat_" + Date.now(), title: "പുതിയ ചാറ്റ്", updatedAt: new Date().toLocaleString("ml-IN"), turns: [] };
+  state.currentSessionId = s.id;
+  return s;
+}
+function saveCurrentSession(session) {
+  session.updatedAt = new Date().toLocaleString("ml-IN");
+  const idx = state.sessions.findIndex(x => x.id === session.id);
+  if (idx >= 0) state.sessions.splice(idx, 1);
+  state.sessions.unshift(session);
+  state.sessions = state.sessions.slice(0, MAX_SAVED_SESSIONS);
+  localStorage.setItem("mai_sessions_v2", JSON.stringify(state.sessions));
+}
+function startNewChat() {
+  if (state.isRunning) return showToast("ഇപ്പോഴത്തെ ഉത്തരം പൂർത്തിയാകട്ടെ...");
+  createFreshSession();
+  renderChatThread();
+  document.getElementById("promptInput").focus();
+  showToast("പുതിയ ചാറ്റ് തുടങ്ങി");
+}
+
+async function doLogin() {
+  const url = document.getElementById("loginWorkerUrl").value.trim().replace(/\/$/, "");
+  const pin = document.getElementById("loginPin").value.trim();
+  const errEl = document.getElementById("loginErr");
+  const btn = document.getElementById("loginBtn");
+  if (!url || !pin) { errEl.textContent = "Worker URL-ഉം PIN-ഉം നൽകുക."; return; }
+  btn.disabled = true; errEl.textContent = "പരിശോധിക്കുന്നു...";
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-App-Pin": pin },
+      body: JSON.stringify({ action: "verify" })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "പരിശോധന പരാജയപ്പെട്ടു");
+    state.workerUrl = url; state.pin = pin;
+    localStorage.setItem("mai_worker", url); localStorage.setItem("mai_pin", pin);
+    document.getElementById("loginScreen").style.display = "none"; errEl.textContent = "";
+  } catch (e) { errEl.textContent = e.message; }
+  finally { btn.disabled = false; }
+}
+function logout() {
+  localStorage.removeItem("mai_pin"); state.pin = "";
+  document.getElementById("loginPin").value = "";
+  document.getElementById("loginWorkerUrl").value = state.workerUrl;
+  document.getElementById("loginScreen").style.display = "flex";
+}
+
+function renderModelChips() {
+  const bar = document.getElementById("modelsBar");
+  const synthSel = document.getElementById("synthModelSelect");
+  const prevSynth = synthSel.value;
+  bar.innerHTML = ""; synthSel.innerHTML = "";
+  state.models.forEach((m, idx) => {
+    const label = document.createElement("label");
+    label.className = "model-chip" + (m.enabled ? " active" : "");
+    label.innerHTML = `<input type="checkbox" ${m.enabled ? "checked" : ""}> ${escapeHtml(m.name)}`;
+    label.querySelector("input").addEventListener("change", (e) => {
+      state.models[idx].enabled = e.target.checked;
+      label.classList.toggle("active", e.target.checked);
+      localStorage.setItem("mai_models", JSON.stringify(state.models));
+    });
+    bar.appendChild(label);
+    const opt = document.createElement("option");
+    opt.value = m.id; opt.textContent = m.name;
+    synthSel.appendChild(opt);
+  });
+  if (prevSynth && [...synthSel.options].some(o => o.value === prevSynth)) synthSel.value = prevSynth;
+}
+
+function renderChatThread() {
+  const thread = document.getElementById("chatThread");
+  const session = getCurrentSession();
+  updateContextHint(session);
+  if (session.turns.length === 0) {
+    thread.innerHTML = `<div class="empty-state"><h2>മലയാളം Multi-AI ചാറ്റ്</h2><p>നിങ്ങളുടെ ചോദ്യം താഴെ ടൈപ്പ് ചെയ്യുക. തിരഞ്ഞെടുത്ത എല്ലാ AI മോഡലുകളുടെയും ഉത്തരങ്ങൾ ഒത്തുനോക്കി കൃത്യമായ അന്തിമ ഉത്തരം ലഭിക്കും — തുടർചോദ്യങ്ങളും ചോദിക്കാം.</p></div>`;
+    return;
+  }
+  thread.innerHTML = "";
+  session.turns.forEach(turn => thread.appendChild(buildTurnElement(turn, false)));
+  scrollToBottom();
+}
+
+function buildTurnElement(turn, openDetailsDefault) {
+  const wrap = document.createElement("div");
+  wrap.className = "turn-block"; wrap.id = `turn-${turn.id}`;
+  const modelEntries = Object.entries(turn.answers || {});
+  let cardsHtml = "";
+  modelEntries.forEach(([key, m]) => {
+    const badgeClass = m.status === "done" ? "done" : (m.status === "fail" ? "fail" : "loading");
+    const badgeText = m.status === "done" ? `${m.sec}s` : (m.status === "fail" ? "പരാജയം" : "ലോഡിംഗ്...");
+    const bodyHtml = m.status === "done" ? renderMarkdown(m.text) : (m.status === "fail" ? `<div style="color:var(--red);font-size:0.84rem;">${escapeHtml(m.error || "പരാജയപ്പെട്ടു")}</div>` : `<div class="skeleton">ഉത്തരം തയ്യാറാക്കുന്നു...</div>`);
+    cardsHtml += `<div class="ai-card"><div class="card-head"><div class="card-title">${escapeHtml(m.name)} <span class="badge ${badgeClass}" id="badge-${turn.id}-${key}">${badgeText}</span></div><button class="copy-btn" onclick="copyById('body-${turn.id}-${key}')">കോപ്പി</button></div><div class="ai-body" id="body-${turn.id}-${key}">${bodyHtml}</div></div>`;
+  });
+  const finalStatusClass = turn.finalStatus === "done" ? "done" : (turn.finalStatus === "fail" ? "fail" : "loading");
+  const finalBodyHtml = turn.finalStatus === "done" ? renderMarkdown(turn.finalText) : (turn.finalStatus === "fail" ? `<div style="color:var(--red);">${escapeHtml(turn.finalError || "സംഗ്രഹം പരാജയപ്പെട്ടു")}</div>` : `<div class="skeleton">${escapeHtml(turn.finalStatusText || "ഉത്തരങ്ങൾക്കായി കാത്തിരിക്കുന്നു...")}</div>`);
+  wrap.innerHTML = `<div class="user-row"><div class="user-bubble">${escapeHtml(turn.question)}</div></div><div class="final-card"><div class="card-head"><div class="card-title">അന്തിമ ഉത്തരം <span class="badge ${finalStatusClass}" id="final-badge-${turn.id}">${escapeHtml(turn.finalBadge || "കാത്തിരിക്കുന്നു")}</span></div><button class="copy-btn" onclick="copyById('final-body-${turn.id}')">കോപ്പി</button></div><div class="ai-body" id="final-body-${turn.id}">${finalBodyHtml}</div></div><details class="models-details" id="details-${turn.id}" ${openDetailsDefault ? "open" : ""}><summary><span>${modelEntries.length} മോഡലുകളുടെ വെവ്വേറെ ഉത്തരങ്ങൾ</span><span>▼ കാണുക / മറയ്ക്കുക</span></summary><div class="grid">${cardsHtml}</div></details>`;
+  return wrap;
+}
+
+function updateContextHint(session) {
+  const count = session.turns.filter(t => t.finalStatus === "done" && t.finalText).length;
+  const used = Math.min(count, MAX_CONTEXT_TURNS);
+  document.getElementById("contextStatus").textContent = used === 0 ? "പുതിയ ചാറ്റ് • തുടർച്ചയായ സംഭാഷണം സജീവമാണ്" : `മെമ്മറി സജീവം • അവസാന ${used} ചോദ്യോത്തരങ്ങൾ ഓർത്തുവെച്ചിട്ടുണ്ട്`;
+  document.getElementById("turnCounter").textContent = used === 0 ? "" : `ആകെ: ${count}`;
+}
+
+async function callWorker(modelId, messages, timeoutMs = 65000) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+  try {
+    const res = await fetch(state.workerUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-App-Pin": state.pin },
+      body: JSON.stringify({ model: modelId, messages }),
+      signal: ctrl.signal
+    });
+    const data = await res.json();
+    if (!res.ok) { if (res.status === 401) logout(); throw new Error(data.error || `Error ${res.status}`); }
+    return data.content;
+  } catch (err) {
+    if (err.name === "AbortError") throw new Error("സമയം കഴിഞ്ഞു (Timeout)");
+    throw err;
+  } finally { clearTimeout(timer); }
+}
+
+async function sendMessage() {
+  if (state.isRunning) return;
+  const input = document.getElementById("promptInput");
+  const question = input.value.trim();
+  const activeModels = state.models.filter(m => m.enabled);
+  if (!question) return;
+  if (activeModels.length === 0) return showToast("കുറഞ്ഞത് ഒരു മോഡലെങ്കിലും തിരഞ്ഞെടുക്കുക");
+
+  state.isRunning = true; document.getElementById("sendBtn").disabled = true;
+  input.value = ""; input.style.height = "44px";
+
+  const session = getCurrentSession();
+  if (session.turns.length === 0) session.title = question.slice(0, 50);
+
+  const recentTurns = session.turns.filter(t => t.finalStatus === "done" && t.finalText).slice(-MAX_CONTEXT_TURNS);
+  const contextMessages = [];
+  recentTurns.forEach(t => {
+    contextMessages.push({ role: "user", content: t.question });
+    contextMessages.push({ role: "assistant", content: t.finalText });
+  });
+
+  const mlOnly = document.getElementById("mlOnlyToggle").checked;
+  const baseMessages = [];
+  if (mlOnly) {
+    baseMessages.push({ role: "system", content: "Always reply strictly in clear, natural, conversational Malayalam (മലയാളം), even if the user writes in Manglish or English. Avoid awkward literal translations; use English only for essential technical terms." });
+  }
+  baseMessages.push(...contextMessages, { role: "user", content: question });
+
+  const turn = {
+    id: Date.now(), question, finalStatus: "loading",
+    finalBadge: "മോഡലുകൾക്കായി കാത്തിരിക്കുന്നു...",
+    finalStatusText: `തിരഞ്ഞെടുത്ത ${activeModels.length} മോഡലുകളുടെ ഉത്തരങ്ങൾ വന്നാലുടൻ സംഗ്രഹം തയ്യാറാകും...`,
+    finalText: "", answers: {}
+  };
+  activeModels.forEach(m => { turn.answers[m.key] = { name: m.name, id: m.id, status: "loading", text: "", sec: "" }; });
+  session.turns.push(turn);
+
+  const thread = document.getElementById("chatThread");
+  const empty = thread.querySelector(".empty-state");
+  if (empty) empty.remove();
+  thread.appendChild(buildTurnElement(turn, true));
+  scrollToBottom();
+
+  const tasks = activeModels.map(async (m) => {
+    const start = Date.now();
+    const badgeEl = document.getElementById(`badge-${turn.id}-${m.key}`);
+    const bodyEl = document.getElementById(`body-${turn.id}-${m.key}`);
+    try {
+      const reply = await callWorker(m.id, baseMessages);
+      const sec = ((Date.now() - start) / 1000).toFixed(1);
+      turn.answers[m.key] = { ...turn.answers[m.key], status: "done", text: reply, sec };
+      if (badgeEl) { badgeEl.className = "badge done"; badgeEl.textContent = `${sec}s`; }
+      if (bodyEl) { bodyEl.innerHTML = renderMarkdown(reply); }
+    } catch (err) {
+      turn.answers[m.key] = { ...turn.answers[m.key], status: "fail", error: err.message };
+      if (badgeEl) { badgeEl.className = "badge fail"; badgeEl.textContent = "പരാജയം"; }
+      if (bodyEl) { bodyEl.innerHTML = `<div style="color:var(--red);font-size:0.84rem;">${escapeHtml(err.message)}</div>`; }
+    }
+  });
+
+  await Promise.allSettled(tasks);
+
+  const successList = Object.values(turn.answers).filter(a => a.status === "done");
+  const finalBadgeEl = document.getElementById(`final-badge-${turn.id}`);
+  const finalBodyEl = document.getElementById(`final-body-${turn.id}`);
+
+  if (successList.length === 0) {
+    turn.finalStatus = "fail"; turn.finalBadge = "പരാജയപ്പെട്ടു";
+    turn.finalError = "ഒരു മോഡലിൽ നിന്നും ഉത്തരം ലഭിച്ചില്ല. Model ID-കളും OpenRouter ബാലൻസും പരിശോധിക്കുക.";
+    if (finalBadgeEl) { finalBadgeEl.className = "badge fail"; finalBadgeEl.textContent = turn.finalBadge; }
+    if (finalBodyEl) { finalBodyEl.innerHTML = `<div style="color:var(--red);">${escapeHtml(turn.finalError)}</div>`; }
+  } else if (successList.length === 1) {
+    turn.finalStatus = "done"; turn.finalBadge = `${successList[0].name} മാത്രം`; turn.finalText = successList[0].text;
+    if (finalBadgeEl) { finalBadgeEl.className = "badge done"; finalBadgeEl.textContent = turn.finalBadge; }
+    if (finalBodyEl) { finalBodyEl.innerHTML = renderMarkdown(turn.finalText); }
+  } else {
+    const synthId = document.getElementById("synthModelSelect").value;
+    if (finalBadgeEl) { finalBadgeEl.className = "badge loading"; finalBadgeEl.textContent = "സംഗ്രഹിക്കുന്നു..."; }
+    if (finalBodyEl) { finalBodyEl.innerHTML = `<div class="skeleton">${successList.length} ഉത്തരങ്ങൾ ഒത്തുനോക്കി അന്തിമ ഉത്തരം തയ്യാറാക്കുന്നു...</div>`; }
+    const combined = successList.map(a => `### ${a.name}:\n${a.text}`).join("\n\n---\n\n");
+    const pastContextText = recentTurns.length > 0 ? "Previous Conversation Context:\n" + recentTurns.slice(-3).map(t => `User: ${t.question}\nAssistant: ${t.finalText}`).join("\n\n") + "\n\n---\n\n" : "";
+    const langRule = mlOnly ? "Write the entire final answer strictly in clear, natural, conversational Malayalam (മലയാളം), even if the user wrote in Manglish or English. Avoid stiff literal translations." : "Write the final answer in the same language as the user's question.";
+    const synthPrompt = [
+      { role: "system", content: `You are an expert synthesis assistant in a multi-turn conversation. Compare the given AI responses to the user's latest question (keeping previous context in mind). Combine the most accurate, consensus points into one clear, helpful final answer. Briefly note any major disagreements or factual mistakes if present. ${langRule}` },
+      { role: "user", content: `${pastContextText}Latest User Question:\n${question}\n\nAI Responses:\n${combined}` }
+    ];
+    try {
+      const start = Date.now();
+      const synthReply = await callWorker(synthId, synthPrompt);
+      const sec = ((Date.now() - start) / 1000).toFixed(1);
+      turn.finalStatus = "done"; turn.finalBadge = `പൂർത്തിയായി (${sec}s)`; turn.finalText = synthReply;
+      if (finalBadgeEl) { finalBadgeEl.className = "badge done"; finalBadgeEl.textContent = turn.finalBadge; }
+      if (finalBodyEl) { finalBodyEl.innerHTML = renderMarkdown(synthReply); }
+    } catch (err) {
+      turn.finalStatus = "fail"; turn.finalBadge = "സംഗ്രഹം പരാജയം"; turn.finalError = "സംഗ്രഹം തയ്യാറാക്കാനായില്ല: " + err.message;
+      if (finalBadgeEl) { finalBadgeEl.className = "badge fail"; finalBadgeEl.textContent = turn.finalBadge; }
+      if (finalBodyEl) { finalBodyEl.innerHTML = `<div style="color:var(--red);">${escapeHtml(turn.finalError)}</div>`; }
+    }
+  }
+
+  saveCurrentSession(session); updateContextHint(session); scrollToBottom();
+  state.isRunning = false; document.getElementById("sendBtn").disabled = false;
+}
+
+function openSettings() {
+  document.getElementById("setWorkerUrl").value = state.workerUrl;
+  renderModelSettings(state.models);
+  document.getElementById("settingsModal").style.display = "flex";
+}
+function renderModelSettings(list) {
+  document.getElementById("modelSettingsInputs").innerHTML = list.map((m, i) => `
+    <label class="field-label">${escapeHtml(m.name)} (Model ID)</label>
+    <input type="text" class="input-field" id="set-model-${i}" value="${escapeHtml(m.id)}" data-name="${escapeHtml(m.name)}" data-key="${escapeHtml(m.key)}">
+  `).join("");
+}
+function applyPreset(type) { renderModelSettings(cloneObj(PRESETS[type])); }
+function saveSettings() {
+  const newUrl = document.getElementById("setWorkerUrl").value.trim().replace(/\/$/, "");
+  if (newUrl) { state.workerUrl = newUrl; localStorage.setItem("mai_worker", newUrl); }
+  state.models = state.models.map((m, i) => {
+    const inp = document.getElementById(`set-model-${i}`);
+    return { key: inp.dataset.key, name: inp.dataset.name, id: inp.value.trim(), enabled: m.enabled };
+  });
+  localStorage.setItem("mai_models", JSON.stringify(state.models));
+  renderModelChips(); closeModal("settingsModal"); showToast("സെറ്റിംഗ്സ് സേവ് ചെയ്തു");
+}
+
+function openHistory() {
+  const list = document.getElementById("historyList");
+  list.innerHTML = state.sessions.length === 0
+    ? `<p style="color:var(--muted);text-align:center;padding:24px;">സേവ് ചെയ്ത ചാറ്റുകളൊന്നുമില്ല.</p>`
+    : state.sessions.map(s => `<div class="history-item ${s.id === state.currentSessionId ? "active-chat" : ""}"><div class="history-main" onclick="loadSession('${s.id}')"><div class="history-q">${escapeHtml(s.title)}</div><div class="history-meta">${escapeHtml(s.updatedAt)} • ${s.turns.length} ചോദ്യങ്ങൾ</div></div><button class="del-btn" onclick="deleteSession('${s.id}')">✕</button></div>`).join("");
+  document.getElementById("historyModal").style.display = "flex";
+}
+function loadSession(id) {
+  if (state.isRunning) return showToast("ഇപ്പോഴത്തെ ഉത്തരം പൂർത്തിയാകട്ടെ...");
+  state.currentSessionId = id; renderChatThread(); closeModal("historyModal");
+}
+function deleteSession(id) {
+  state.sessions = state.sessions.filter(s => s.id !== id);
+  localStorage.setItem("mai_sessions_v2", JSON.stringify(state.sessions));
+  if (state.currentSessionId === id) {
+    if (state.sessions.length > 0) state.currentSessionId = state.sessions[0].id;
+    else createFreshSession();
+    renderChatThread();
+  }
+  openHistory();
+}
+function clearAllSessions() {
+  if (!confirm("സേവ് ചെയ്ത എല്ലാ ചാറ്റുകളും മായ്ക്കണോ?")) return;
+  state.sessions = []; localStorage.removeItem("mai_sessions_v2");
+  createFreshSession(); renderChatThread(); openHistory();
+}
+function closeModal(id) { document.getElementById(id).style.display = "none"; }
+function scrollToBottom() { const t = document.getElementById("chatThread"); requestAnimationFrame(() => { t.scrollTop = t.scrollHeight; }); }
+function copyById(elId) { const el = document.getElementById(elId); if (el) navigator.clipboard.writeText(el.innerText).then(() => showToast("കോപ്പി ചെയ്തു!")); }
+let toastTimer;
+function showToast(msg) { const t = document.getElementById("toast"); t.textContent = msg; t.style.display = "block"; clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.style.display = "none"; }, 2000); }
+function escapeHtml(str) { return String(str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+function renderMarkdown(text) {
+  if (!text) return "";
+  const codeBlocks = [];
+  let safe = escapeHtml(text);
+  safe = safe.replace(/```(\w*)\n?([\s\S]*?)```/g, (_, lang, code) => { const idx = codeBlocks.length; codeBlocks.push(`<pre><code>${code.trim()}</code></pre>`); return `@@CODEBLOCK_${idx}@@`; });
+  safe = safe.replace(/`([^`]+)`/g, "<code>$1</code>");
+  safe = safe.replace(/^### (.*$)/gim, "<h4>$1</h4>");
+  safe = safe.replace(/^## (.*$)/gim, "<h3>$1</h3>");
+  safe = safe.replace(/^# (.*$)/gim, "<h3>$1</h3>");
+  safe = safe.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+  safe = safe.replace(/\*([^*\n]+)\*/g, "<em>$1</em>");
+  safe = safe.replace(/^\s*[-*]\s+(.*)$/gim, "<li>$1</li>");
+  safe = safe.replace(/(<li>[\s\S]*?<\/li>)/g, "<ul>$1</ul>");
+  safe = safe.replace(/<\/ul>\s*<ul>/g, "");
+  safe = safe.replace(/\n/g, "<br>");
+  safe = safe.replace(/<br>(<\/?(?:h3|h4|ul|li)>)/g, "$1");
+  safe = safe.replace(/(<\/(?:h3|h4|ul|li)>)<br>/g, "$1");
+  codeBlocks.forEach((block, idx) => { safe = safe.replace(`@@CODEBLOCK_${idx}@@`, block); });
+  return safe;
+}
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch((err) => console.warn("SW failed:", err));
+  });
+}
+</script>
+</body>
+</html>
