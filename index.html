@@ -2,136 +2,902 @@
 <html lang="ml">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Multi-AI Hub (മലയാളം)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
+<title>Multi-AI Hub</title>
 <link rel="manifest" href="./manifest.json">
-<meta name="theme-color" content="#0d1117">
+<meta name="theme-color" content="#faf9f5">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Multi-AI">
 <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
 <link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Inter:wght@400;500;600&family=Noto+Sans+Malayalam:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0d1117; --card: #161b22; --card2: #1f2631; --border: #30363d;
-    --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff; --user-bg: #1f3a5f;
-    --green: #3fb950; --red: #f85149; --gold: #d29922;
+    --bg: #faf9f5;
+    --surface: #ffffff;
+    --pill: #f0eee8;
+    --pill-hover: #e7e4dc;
+    --border: #e6e3da;
+    --border-strong: #d5d1c6;
+    --text: #1c1b18;
+    --text-soft: #5c5952;
+    --muted: #8a867e;
+    --accent: #6baaae;
+    --accent-dark: #58969a;
+    --accent-light: #9ed2d5;
+    --accent-soft: rgba(107, 170, 174, 0.16);
+    --dark-btn: #141413;
+    --green: #1f7a44;
+    --red: #c93b3b;
+    --gold: #9a6700;
+    --shadow-composer: 0 4px 20px rgba(28, 27, 24, 0.06), 0 1px 3px rgba(28, 27, 24, 0.04);
+    --font-serif: "Newsreader", "Noto Sans Malayalam", Georgia, serif;
+    --font-sans: "Inter", "Noto Sans Malayalam", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { height: 100%; }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    height: 100%;
+    height: 100dvh;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 16px;
+  }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: var(--bg); color: var(--text); line-height: 1.65;
-    display: flex; flex-direction: column; overflow: hidden;
+    font-family: var(--font-sans);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    line-height: 1.65;
   }
+
+  /* Developer-only visibility control */
+  .dev-only { display: none !important; }
+  body.dev-unlocked .dev-only { display: flex !important; }
+  body.dev-unlocked .dev-only-block { display: block !important; }
+  body.dev-unlocked .dev-only-inline { display: inline-flex !important; }
+  .dev-only-block, .dev-only-inline { display: none !important; }
+
+  .secret-trigger {
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+  }
+
+  /* Round Photo Avatar Styles */
+  .avatar-circle {
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center 15%;
+    background: #ffffff;
+    border: 1.5px solid var(--border-strong);
+    box-shadow: 0 2px 8px rgba(28, 27, 24, 0.09);
+    flex-shrink: 0;
+    display: block;
+  }
+  .avatar-circle.av-welcome { width: 74px; height: 74px; margin: 0 auto 16px; }
+  .avatar-circle.av-login   { width: 66px; height: 66px; margin: 0 auto 12px; }
+  .avatar-circle.av-chat    { width: 28px; height: 28px; border-width: 1px; }
+  .avatar-circle.av-drawer  { width: 30px; height: 30px; border-width: 1px; }
+  .avatar-circle.av-preview { width: 52px; height: 52px; }
+
+  .avatar-fallback {
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+  .avatar-fallback.av-welcome { width: 48px; height: 48px; margin: 0 auto 18px; }
+  .avatar-fallback.av-login   { width: 44px; height: 44px; margin: 0 auto 12px; }
+  .avatar-fallback.av-chat    { width: 22px; height: 22px; }
+  .avatar-fallback.av-drawer  { width: 24px; height: 24px; }
+  .avatar-fallback.av-preview { width: 42px; height: 42px; }
+  .avatar-fallback svg { width: 100%; height: 100%; }
+
+  /* Floating Small Round Speaker & Copy Buttons on Right Side of Screen */
+  .side-float-actions {
+    position: fixed;
+    right: 10px;
+    top: 52%;
+    transform: translateY(-50%);
+    z-index: 35;
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .side-float-actions.visible {
+    display: flex;
+  }
+  .side-round-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: none;
+    background: var(--accent);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(28, 27, 24, 0.16);
+    transition: background 0.15s, transform 0.12s, box-shadow 0.15s;
+  }
+  .side-round-btn:active {
+    background: var(--accent-dark);
+    transform: scale(0.92);
+  }
+  .side-round-btn.speaking {
+    background: var(--accent-dark);
+    box-shadow: 0 0 0 4px rgba(107, 170, 174, 0.34);
+    animation: pulse 1.3s infinite;
+  }
+  .side-round-btn svg {
+    width: 16px;
+    height: 16px;
+    display: block;
+  }
+
+  /* Modern Thinking Motion (#6baaae Theme) */
+  .thinking-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 11px;
+    padding: 8px 4px;
+  }
+  .thinking-sparkle-wrap {
+    position: relative;
+    width: 26px;
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .thinking-glow {
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, #6baaae, #9ed2d5, #4b8a8e, #82bfc3, #6baaae);
+    opacity: 0.34;
+    filter: blur(5px);
+    animation: aiGlowSpin 2.2s linear infinite;
+  }
+  .thinking-sparkle {
+    width: 22px;
+    height: 22px;
+    position: relative;
+    z-index: 1;
+    animation: aiSparklePulse 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+  .thinking-label {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 0.015em;
+    background: linear-gradient(
+      110deg,
+      #8b9697 0%,
+      #8b9697 30%,
+      #4b8a8e 44%,
+      #6baaae 52%,
+      #9ed2d5 60%,
+      #8b9697 74%,
+      #8b9697 100%
+    );
+    background-size: 260% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: aiTextSweep 2.1s linear infinite;
+  }
+
+  @keyframes aiGlowSpin {
+    0%   { transform: rotate(0deg) scale(0.92); opacity: 0.24; }
+    50%  { transform: rotate(180deg) scale(1.12); opacity: 0.44; }
+    100% { transform: rotate(360deg) scale(0.92); opacity: 0.24; }
+  }
+  @keyframes aiSparklePulse {
+    0%   { transform: rotate(0deg) scale(0.88); }
+    45%  { transform: rotate(180deg) scale(1.1); }
+    55%  { transform: rotate(180deg) scale(1.1); }
+    100% { transform: rotate(360deg) scale(0.88); }
+  }
+  @keyframes aiTextSweep {
+    0%   { background-position: 120% 0; }
+    100% { background-position: -140% 0; }
+  }
+
+  /* Top Navigation Bar */
   header {
-    flex-shrink: 0; background: rgba(13, 17, 23, 0.96);
-    border-bottom: 1px solid var(--border); padding: 10px 14px;
-    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    flex-shrink: 0;
+    height: 56px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg);
+    z-index: 20;
   }
-  .logo { font-size: 1.05rem; font-weight: 700; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
-  .logo span { color: var(--accent); }
-  .header-actions { display: flex; gap: 6px; flex-wrap: nowrap; }
-  .icon-btn {
-    background: var(--card2); color: var(--text); border: 1px solid var(--border);
-    padding: 6px 10px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; white-space: nowrap;
+  .top-icon-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s;
   }
-  .icon-btn.primary { background: rgba(88,166,255,0.15); border-color: var(--accent); color: var(--accent); font-weight: 600; }
-  .icon-btn:active { opacity: 0.7; }
-  .top-controls {
-    flex-shrink: 0; background: var(--card); border-bottom: 1px solid var(--border);
-    padding: 8px 14px; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;
+  .top-icon-btn:active { background: var(--pill); }
+  .top-icon-btn.ghost-active {
+    background: var(--accent);
+    color: #fff;
   }
-  .models-bar { display: flex; flex-wrap: wrap; gap: 6px; }
-  .model-chip {
-    display: flex; align-items: center; gap: 5px; background: var(--bg);
-    border: 1px solid var(--border); padding: 4px 9px; border-radius: 16px;
-    font-size: 0.78rem; cursor: pointer; user-select: none;
+  .header-center {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-soft);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
   }
-  .model-chip input { accent-color: var(--accent); }
-  .model-chip.active { border-color: var(--accent); background: rgba(88,166,255,0.12); }
-  .meta-controls { display: flex; align-items: center; gap: 10px; font-size: 0.78rem; color: var(--muted); flex-wrap: wrap; }
-  .synth-select { background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 4px 6px; font-size: 0.78rem; }
-  #chatThread { flex: 1; overflow-y: auto; padding: 16px 14px 24px; width: 100%; max-width: 960px; margin: 0 auto; scroll-behavior: smooth; }
-  .empty-state { text-align: center; padding: 60px 16px; color: var(--muted); }
-  .empty-state h2 { color: var(--text); font-size: 1.25rem; margin-bottom: 8px; }
-  .empty-state p { font-size: 0.9rem; max-width: 440px; margin: 0 auto; }
-  .turn-block { margin-bottom: 24px; }
-  .user-row { display: flex; justify-content: flex-end; margin-bottom: 12px; }
+  .header-center.visible { opacity: 1; pointer-events: auto; }
+  .incognito-tag {
+    font-size: 12px;
+    background: var(--accent);
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 12px;
+  }
+
+  /* Main Chat Area */
+  #chatThread {
+    flex: 1;
+    overflow-y: auto;
+    width: 100%;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 8px 18px 24px;
+    display: flex;
+    flex-direction: column;
+    scroll-behavior: smooth;
+  }
+  #chatThread.has-turns {
+    padding-right: 54px;
+  }
+
+  /* Empty / Welcome State */
+  .welcome-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 16px 12px 36px;
+    min-height: 260px;
+  }
+  .greeting-title {
+    font-family: var(--font-serif);
+    font-size: clamp(1.7rem, 6.4vw, 2.25rem);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin-bottom: 20px;
+    line-height: 1.2;
+  }
+  .plan-pill {
+    align-items: center;
+    gap: 6px;
+    background: var(--pill);
+    border: none;
+    border-radius: 999px;
+    padding: 8px 18px;
+    font-size: 14px;
+    color: var(--text-soft);
+    cursor: pointer;
+    font-family: var(--font-sans);
+    transition: background 0.15s;
+  }
+  .plan-pill:active { background: var(--pill-hover); }
+  .plan-pill strong { color: var(--text); font-weight: 600; }
+
+  /* Chat Turns — 16sp (16px) Reading Size */
+  .turn-block { margin-bottom: 26px; }
+  .user-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 16px;
+  }
   .user-bubble {
-    background: var(--user-bg); border: 1px solid rgba(88,166,255,0.35); color: var(--text);
-    padding: 10px 14px; border-radius: 14px 14px 4px 14px; max-width: 86%;
-    font-size: 0.95rem; white-space: pre-wrap; word-wrap: break-word;
+    background: var(--pill);
+    color: var(--text);
+    padding: 11px 16px;
+    border-radius: 20px 20px 6px 20px;
+    max-width: 88%;
+    font-size: 16px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-wrap: break-word;
   }
-  .final-card {
-    background: linear-gradient(180deg, rgba(88,166,255,0.08), var(--card));
-    border: 1px solid rgba(88,166,255,0.55); border-radius: 14px; padding: 14px;
+
+  .final-wrap { padding: 2px 2px 6px; }
+  .final-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    gap: 8px;
   }
-  .card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 8px; }
-  .card-title { font-weight: 700; font-size: 0.92rem; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-  .badge { font-size: 0.7rem; padding: 2px 7px; border-radius: 10px; background: var(--card2); color: var(--muted); border: 1px solid var(--border); font-weight: 500; }
-  .badge.loading { color: var(--gold); border-color: var(--gold); }
-  .badge.done { color: var(--green); border-color: var(--green); }
-  .badge.fail { color: var(--red); border-color: var(--red); }
-  .copy-btn { background: transparent; color: var(--muted); border: 1px solid var(--border); border-radius: 6px; padding: 3px 8px; font-size: 0.74rem; cursor: pointer; }
-  .models-details { margin-top: 10px; border: 1px solid var(--border); border-radius: 12px; background: rgba(22, 27, 34, 0.65); overflow: hidden; }
-  .models-details summary { padding: 9px 12px; font-size: 0.82rem; color: var(--muted); cursor: pointer; user-select: none; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-  .models-details summary::-webkit-details-marker { display: none; }
-  .models-details[open] summary { border-bottom: 1px solid var(--border); color: var(--text); }
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 10px; padding: 10px; }
-  .ai-card { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; }
-  .ai-body { font-size: 0.92rem; color: var(--text); word-wrap: break-word; }
-  .ai-card .ai-body { max-height: 320px; overflow-y: auto; font-size: 0.87rem; }
-  .ai-body pre { background: #090d13; padding: 10px; border-radius: 8px; overflow-x: auto; margin: 8px 0; border: 1px solid var(--border); font-size: 0.82rem; line-height: 1.45; }
-  .ai-body code { background: rgba(110,118,129,0.25); padding: 1px 5px; border-radius: 4px; font-family: monospace; font-size: 0.84rem; }
+  .final-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .msg-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .badge {
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--pill);
+    color: var(--text-soft);
+    font-weight: 500;
+  }
+  .badge.loading { color: var(--gold); background: rgba(154, 103, 0, 0.1); }
+  .badge.done { color: var(--green); background: rgba(31, 122, 68, 0.1); }
+  .badge.fail { color: var(--red); background: rgba(201, 59, 59, 0.1); }
+
+  .error-detail-note {
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--muted);
+    word-break: break-word;
+  }
+
+  /* Small Round Icon-Only Buttons (For Dev Individual Cards too) */
+  .mini-round-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: var(--accent);
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .mini-round-btn:active { background: var(--accent-dark); transform: scale(0.92); }
+  .mini-round-btn.speaking {
+    background: var(--accent-dark);
+    box-shadow: 0 0 0 3px rgba(107, 170, 174, 0.32);
+    animation: pulse 1.3s infinite;
+  }
+  .mini-round-btn svg { width: 13px; height: 13px; display: block; }
+
+  .ai-body {
+    font-size: 16px;
+    color: var(--text);
+    word-wrap: break-word;
+    line-height: 1.75;
+  }
+  .ai-body pre {
+    background: #f3f1eb;
+    padding: 12px;
+    border-radius: 12px;
+    overflow-x: auto;
+    margin: 10px 0;
+    border: 1px solid var(--border);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .ai-body code {
+    background: #efede6;
+    padding: 1px 5px;
+    border-radius: 5px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 14px;
+  }
   .ai-body pre code { background: transparent; padding: 0; }
-  .ai-body h3, .ai-body h4 { margin: 10px 0 4px; color: var(--accent); font-size: 0.98rem; }
-  .ai-body ul { padding-left: 20px; margin: 6px 0; }
-  .ai-body li { margin-bottom: 3px; }
-  .skeleton { color: var(--muted); font-style: italic; font-size: 0.86rem; }
-  .composer-bar { flex-shrink: 0; background: var(--card); border-top: 1px solid var(--border); padding: 10px 12px; }
-  .composer-inner { max-width: 960px; margin: 0 auto; display: flex; align-items: flex-end; gap: 8px; }
-  #promptInput {
-    flex: 1; background: var(--bg); color: var(--text); border: 1px solid var(--border);
-    border-radius: 12px; padding: 10px 12px; font-size: 0.96rem; font-family: inherit;
-    resize: none; min-height: 44px; max-height: 140px; outline: none; line-height: 1.45;
+  .ai-body h3, .ai-body h4 {
+    font-family: var(--font-sans);
+    margin: 12px 0 4px;
+    color: var(--text);
+    font-size: 18px;
+    font-weight: 700;
   }
-  #promptInput:focus { border-color: var(--accent); }
-  .send-btn { background: var(--accent); color: #0d1117; border: none; border-radius: 12px; padding: 0 18px; height: 44px; font-weight: 700; font-size: 0.9rem; cursor: pointer; flex-shrink: 0; }
-  .send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-  .context-hint { max-width: 960px; margin: 4px auto 0; font-size: 0.72rem; color: var(--muted); display: flex; justify-content: space-between; }
-  #loginScreen { position: fixed; inset: 0; z-index: 100; background: var(--bg); display: flex; align-items: center; justify-content: center; padding: 20px; }
-  .login-box { width: 100%; max-width: 360px; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 24px; text-align: center; }
-  .login-box h2 { margin-bottom: 6px; font-size: 1.25rem; }
-  .login-box p { color: var(--muted); font-size: 0.84rem; margin-bottom: 16px; }
-  .input-field { width: 100%; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 10px; padding: 11px; font-size: 0.95rem; margin-bottom: 10px; outline: none; }
-  .input-field:focus { border-color: var(--accent); }
-  .btn-primary { width: 100%; background: var(--accent); color: #0d1117; border: none; border-radius: 10px; padding: 11px; font-size: 0.94rem; font-weight: 700; cursor: pointer; }
+  .ai-body ul { padding-left: 20px; margin: 6px 0; }
+  .ai-body li { margin-bottom: 5px; }
+
+  /* Collapsible Individual Models (Developer Mode Only) */
+  .models-details {
+    margin-top: 12px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--surface);
+    overflow: hidden;
+  }
+  .models-details summary {
+    padding: 10px 14px;
+    font-size: 14px;
+    color: var(--text-soft);
+    cursor: pointer;
+    user-select: none;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .models-details summary::-webkit-details-marker { display: none; }
+  .models-details[open] summary {
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    font-weight: 500;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 10px;
+    padding: 10px;
+    background: #faf9f5;
+  }
+  .ai-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+  }
+  .ai-card .card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    gap: 6px;
+  }
+  .ai-card .card-title {
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .ai-card .ai-body {
+    max-height: 280px;
+    overflow-y: auto;
+    font-size: 16px;
+    line-height: 1.68;
+  }
+
+  /* Floating Bottom Composer — All Buttons #6baaae */
+  .composer-outer {
+    flex-shrink: 0;
+    width: 100%;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 8px 14px calc(12px + env(safe-area-inset-bottom, 0px));
+    background: var(--bg);
+  }
+  .composer-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 30px;
+    box-shadow: var(--shadow-composer);
+    padding: 7px 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: border-radius 0.18s ease, padding 0.18s ease, border-color 0.15s;
+  }
+  .composer-box.expanded {
+    border-radius: 26px;
+    padding: 14px 12px 10px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    border-color: var(--accent);
+  }
+
+  .composer-input-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    min-width: 0;
+  }
+  .composer-box.expanded .composer-input-wrap {
+    width: 100%;
+    padding: 0 6px;
+  }
+  #promptInput {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.45;
+    resize: none;
+    max-height: 140px;
+    min-height: 24px;
+    padding: 4px 2px;
+  }
+  #promptInput::placeholder { color: var(--muted); }
+
+  .composer-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .composer-box:not(.expanded) .composer-actions { display: contents; }
+  .actions-left, .actions-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .composer-box:not(.expanded) .actions-left { order: -1; }
+  .composer-box:not(.expanded) .actions-right { order: 2; }
+  .composer-box:not(.expanded) .model-pill-btn { display: none !important; }
+
+  .circle-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: none;
+    background: var(--accent);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .circle-btn:active { background: var(--accent-dark); transform: scale(0.95); }
+  .circle-btn.recording { background: var(--red); color: #fff; animation: pulse 1.2s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.65; } }
+
+  .model-pill-btn {
+    height: 38px;
+    padding: 0 14px;
+    border-radius: 999px;
+    border: none;
+    background: var(--accent);
+    color: #ffffff;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 500;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    max-width: 195px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .model-pill-btn:active { background: var(--accent-dark); }
+
+  .primary-circle-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: none;
+    background: var(--accent);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.15s, opacity 0.15s, transform 0.1s;
+  }
+  .primary-circle-btn:active { background: var(--accent-dark); transform: scale(0.95); }
+  .primary-circle-btn.ready-send { background: var(--accent); }
+  .primary-circle-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  /* Slide-out Left Sidebar Drawer */
+  .drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(28, 27, 24, 0.35);
+    z-index: 80;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.22s;
+  }
+  .drawer-backdrop.open { opacity: 1; pointer-events: auto; }
+  .drawer {
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    width: min(310px, 84vw);
+    background: var(--bg);
+    border-right: 1px solid var(--border);
+    z-index: 85;
+    transform: translateX(-100%);
+    transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+  }
+  .drawer.open { transform: translateX(0); }
+  .drawer-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .drawer-brand {
+    font-family: var(--font-serif);
+    font-size: 20px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .dev-badge {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--accent);
+    color: #fff;
+    padding: 2px 7px;
+    border-radius: 999px;
+  }
+  .drawer-new-btn {
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    margin-bottom: 14px;
+  }
+  .drawer-new-btn:active { background: var(--pill); }
+  .drawer-section-label {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 6px 4px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .drawer-history { flex: 1; overflow-y: auto; }
+  .history-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 9px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-bottom: 4px;
+  }
+  .history-item:hover, .history-item.active-chat { background: var(--pill); }
+  .history-main { flex: 1; min-width: 0; }
+  .history-q { font-size: 15px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .history-meta { font-size: 12px; color: var(--muted); }
+  .del-btn { background: transparent; border: none; color: var(--muted); cursor: pointer; padding: 4px 6px; font-size: 14px; }
+  .drawer-footer {
+    border-top: 1px solid var(--border);
+    padding-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .drawer-foot-btn {
+    flex: 1;
+    min-width: 90px;
+    padding: 9px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* Bottom Sheet & Modals */
+  .modal-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 95;
+    background: rgba(28, 27, 24, 0.4);
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .modal-bg.center-modal { align-items: center; padding: 16px; }
+  .sheet {
+    width: 100%;
+    max-width: 540px;
+    max-height: 85dvh;
+    overflow-y: auto;
+    background: var(--bg);
+    border-radius: 24px 24px 0 0;
+    padding: 18px 18px calc(20px + env(safe-area-inset-bottom, 0px));
+    box-shadow: 0 -8px 30px rgba(0,0,0,0.12);
+  }
+  .modal-bg.center-modal .sheet { border-radius: 22px; }
+  .sheet-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sheet-head h3 { font-family: var(--font-serif); font-size: 20px; font-weight: 500; }
+  .close-pill {
+    width: 32px; height: 32px; border-radius: 50%; border: none;
+    background: var(--pill); color: var(--text); cursor: pointer; font-size: 15px;
+  }
+
+  .avatar-upload-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+  .avatar-upload-actions { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+  .avatar-upload-actions small { font-size: 13px; color: var(--muted); }
+  .upload-btn-row { display: flex; gap: 8px; }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 11px 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin-bottom: 8px;
+    cursor: pointer;
+  }
+  .toggle-row span { font-size: 15px; font-weight: 500; }
+  .toggle-row small { display: block; font-size: 13px; color: var(--muted); font-weight: 400; }
+  .toggle-row input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); }
+
+  .field-label { display: block; font-size: 14px; color: var(--text-soft); margin: 10px 0 4px; font-weight: 500; }
+  .input-field, .select-field {
+    width: 100%;
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 11px 12px;
+    font-size: 16px;
+    font-family: inherit;
+    outline: none;
+    margin-bottom: 6px;
+  }
+  .input-field:focus, .select-field:focus { border-color: var(--accent); }
+  .preset-row { display: flex; gap: 8px; margin: 10px 0; }
+  .preset-btn {
+    flex: 1;
+    background: var(--pill);
+    color: var(--text);
+    border: none;
+    border-radius: 10px;
+    padding: 9px 10px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+  }
+  .btn-primary {
+    width: 100%;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+    font-family: inherit;
+  }
+  .btn-primary:active { background: var(--accent-dark); }
   .btn-primary:disabled { opacity: 0.5; }
-  .err-msg { color: var(--red); font-size: 0.84rem; margin-top: 10px; min-height: 20px; }
-  .modal-bg { position: fixed; inset: 0; z-index: 90; background: rgba(0,0,0,0.75); display: none; align-items: center; justify-content: center; padding: 14px; }
-  .modal { width: 100%; max-width: 520px; max-height: 86vh; overflow-y: auto; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
-  .modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
-  .field-label { display: block; font-size: 0.78rem; color: var(--muted); margin: 8px 0 4px; }
-  .preset-row { display: flex; gap: 8px; margin-bottom: 10px; }
-  .preset-btn { flex: 1; background: var(--card2); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 8px; font-size: 0.8rem; cursor: pointer; }
-  .history-item { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-  .history-item.active-chat { border-color: var(--accent); }
-  .history-main { flex: 1; cursor: pointer; min-width: 0; }
-  .history-q { font-weight: 600; font-size: 0.88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .history-meta { font-size: 0.74rem; color: var(--muted); margin-top: 2px; }
-  .del-btn { background: transparent; border: none; color: var(--muted); font-size: 0.95rem; cursor: pointer; padding: 4px 6px; }
-  .del-btn:hover { color: var(--red); }
-  #toast { position: fixed; bottom: 84px; left: 50%; transform: translateX(-50%); background: #238636; color: #fff; padding: 7px 14px; border-radius: 20px; font-size: 0.82rem; display: none; z-index: 120; }
+
+  /* Login Screen */
+  #loginScreen {
+    position: fixed;
+    inset: 0;
+    z-index: 120;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .login-box {
+    width: 100%;
+    max-width: 360px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 28px 22px;
+    text-align: center;
+    box-shadow: var(--shadow-composer);
+  }
+  .login-box h2 { font-family: var(--font-serif); font-size: 25px; font-weight: 500; margin-bottom: 6px; }
+  .login-box p { color: var(--text-soft); font-size: 14px; margin-bottom: 18px; }
+  .err-msg { color: var(--red); font-size: 14px; margin-top: 10px; min-height: 20px; }
+
+  #toast {
+    position: fixed;
+    top: 64px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--dark-btn);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 14px;
+    display: none;
+    z-index: 150;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+  }
 </style>
 </head>
 <body>
 
+<!-- Shared SVG Gradient for #6baaae Sparkle -->
+<svg width="0" height="0" style="position:absolute;">
+  <defs>
+    <linearGradient id="tealSparkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4b8a8e"/>
+      <stop offset="50%" stop-color="#6baaae"/>
+      <stop offset="100%" stop-color="#9ed2d5"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<!-- Login Screen -->
 <div id="loginScreen">
   <div class="login-box">
+    <div id="loginAvatarSlot"></div>
     <h2>Multi-AI Hub</h2>
-    <p>തുടരാൻ നിങ്ങളുടെ Worker URL & PIN നൽകുക</p>
+    <p>തുടരാൻ Worker URL-ഉം PIN-ഉം നൽകുക</p>
     <input type="url" id="loginWorkerUrl" class="input-field" placeholder="https://multi-ai-proxy.....workers.dev">
     <input type="password" id="loginPin" class="input-field" placeholder="PIN / Password">
     <button class="btn-primary" id="loginBtn" onclick="doLogin()">പ്രവേശിക്കുക</button>
@@ -139,72 +905,216 @@
   </div>
 </div>
 
+<!-- Top Header -->
 <header>
-  <div class="logo">Multi-AI <span>Hub</span></div>
-  <div class="header-actions">
-    <button class="icon-btn primary" onclick="startNewChat()">+ പുതിയത്</button>
-    <button class="icon-btn" onclick="openHistory()">ചാറ്റുകൾ</button>
-    <button class="icon-btn" onclick="openSettings()">സെറ്റിംഗ്സ്</button>
-    <button class="icon-btn" onclick="logout()">ലോക്ക്</button>
+  <button class="top-icon-btn" aria-label="Menu" onclick="toggleDrawer(true)">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <line x1="3" y1="9" x2="21" y2="9"></line>
+      <line x1="3" y1="15" x2="14" y2="15"></line>
+    </svg>
+  </button>
+
+  <div class="header-center" id="headerCenter">
+    <span id="headerTitle">Multi-AI</span>
+    <span class="incognito-tag" id="incognitoBadge" style="display:none;">Private</span>
   </div>
+
+  <button class="top-icon-btn" id="ghostBtn" aria-label="Private Chat" title="പ്രൈവറ്റ് ചാറ്റ് (സേവ് ആകില്ല)" onclick="toggleIncognito()">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3a7 7 0 0 0-7 7v9.2c0 .6.7.9 1.2.6l2.3-1.6a1 1 0 0 1 1.2 0l1.7 1.3a1 1 0 0 0 1.2 0l1.7-1.3a1 1 0 0 1 1.2 0l2.3 1.6c.5.3 1.2 0 1.2-.6V10a7 7 0 0 0-7-7Z"/>
+      <circle cx="9.5" cy="11" r="1" fill="currentColor" stroke="none"/>
+      <circle cx="14.5" cy="11" r="1" fill="currentColor" stroke="none"/>
+    </svg>
+  </button>
 </header>
 
-<div class="top-controls">
-  <div class="models-bar" id="modelsBar"></div>
-  <div class="meta-controls">
-    <div style="display:flex;align-items:center;gap:5px;">
-      <span>സംഗ്രഹം:</span>
-      <select id="synthModelSelect" class="synth-select"></select>
-    </div>
-    <label style="display:flex;align-items:center;gap:4px;cursor:pointer;color:var(--text);">
-      <input type="checkbox" id="mlOnlyToggle" checked style="accent-color:var(--accent);"> മലയാളം മാത്രം
-    </label>
-  </div>
-</div>
-
+<!-- Main Chat Thread -->
 <main id="chatThread"></main>
 
-<div class="composer-bar">
-  <div class="composer-inner">
-    <textarea id="promptInput" rows="1" placeholder="മലയാളത്തിലോ മംഗ്ലീഷിലോ ചോദിക്കൂ..."></textarea>
-    <button class="send-btn" id="sendBtn" onclick="sendMessage()">അയക്കുക</button>
-  </div>
-  <div class="context-hint">
-    <span id="contextStatus">പുതിയ ചാറ്റ് • പഴയ മെമ്മറി ഒന്നുമില്ല</span>
-    <span id="turnCounter"></span>
-  </div>
+<!-- Floating Right-Side Round Speaker & Copy Buttons -->
+<div class="side-float-actions" id="sideFloatActions">
+  <button class="side-round-btn" id="floatSpeakBtn" type="button" onclick="speakVisibleAnswer()" title="കേൾക്കുക" aria-label="കേൾക്കുക">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+      <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+    </svg>
+  </button>
+  <button class="side-round-btn" id="floatCopyBtn" type="button" onclick="copyVisibleAnswer()" title="കോപ്പി" aria-label="കോപ്പി">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+    </svg>
+  </button>
 </div>
 
-<div class="modal-bg" id="settingsModal">
-  <div class="modal">
-    <div class="modal-head">
-      <h3>സെറ്റിംഗ്സ് & മോഡൽ ID-കൾ</h3>
-      <button class="icon-btn" onclick="closeModal('settingsModal')">✕</button>
+<!-- Floating Bottom Composer -->
+<div class="composer-outer">
+  <div class="composer-box" id="composerBox">
+    <div class="composer-input-wrap">
+      <textarea id="promptInput" rows="1" placeholder="Type or hold to talk"></textarea>
     </div>
-    <label class="field-label">Cloudflare Worker URL</label>
-    <input type="url" id="setWorkerUrl" class="input-field">
-    <div class="preset-row">
-      <button class="preset-btn" onclick="applyPreset('paid')">Paid മോഡലുകൾ</button>
-      <button class="preset-btn" onclick="applyPreset('free')">Free ടെസ്റ്റ് മോഡലുകൾ</button>
-    </div>
-    <div id="modelSettingsInputs"></div>
-    <p style="font-size:0.75rem;color:var(--muted);margin-bottom:12px;">
-      * openrouter.ai/models നോക്കി ഏറ്റവും പുതിയ Model ID ഇവിടെ അപ്‌ഡേറ്റ് ചെയ്യാം.
-    </p>
-    <button class="btn-primary" onclick="saveSettings()">സേവ് ചെയ്യുക</button>
-  </div>
-</div>
 
-<div class="modal-bg" id="historyModal">
-  <div class="modal">
-    <div class="modal-head">
-      <h3>പഴയ ചാറ്റുകൾ</h3>
-      <div style="display:flex;gap:8px;">
-        <button class="icon-btn" style="color:var(--red)" onclick="clearAllSessions()">എല്ലാം മായ്ക്കുക</button>
-        <button class="icon-btn" onclick="closeModal('historyModal')">✕</button>
+    <div class="composer-actions">
+      <div class="actions-left">
+        <button class="circle-btn" type="button" title="പുതിയ ചാറ്റ്" onclick="handlePlusClick()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </button>
+        <button class="model-pill-btn dev-only" type="button" id="modelPillBtn" onclick="openQuickSheet()">
+          <span id="modelPillLabel">Smart · Gemma 4 31B</span>
+        </button>
+      </div>
+
+      <div class="actions-right">
+        <button class="circle-btn" type="button" id="micBtn" title="വോയ്‌സ് ടൈപ്പിംഗ് (മലയാളം)" onclick="toggleVoice()">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="3" width="6" height="11" rx="3"></rect>
+            <path d="M5 11a7 7 0 0 0 14 0"></path>
+            <line x1="12" y1="18" x2="12" y2="21"></line>
+          </svg>
+        </button>
+
+        <button class="primary-circle-btn" type="button" id="sendBtn" onclick="handlePrimaryAction()" aria-label="Send">
+          <svg id="waveIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <line x1="5" y1="10" x2="5" y2="14"></line>
+            <line x1="9" y1="7" x2="9" y2="17"></line>
+            <line x1="13" y1="5" x2="13" y2="19"></line>
+            <line x1="17" y1="8" x2="17" y2="16"></line>
+            <line x1="21" y1="11" x2="21" y2="13"></line>
+          </svg>
+          <svg id="arrowIcon" style="display:none;" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="19" x2="12" y2="5"></line>
+            <polyline points="5 12 12 5 19 12"></polyline>
+          </svg>
+        </button>
       </div>
     </div>
-    <div id="historyList"></div>
+  </div>
+</div>
+
+<!-- Left Sidebar Drawer -->
+<div class="drawer-backdrop" id="drawerBackdrop" onclick="toggleDrawer(false)"></div>
+<aside class="drawer" id="sideDrawer">
+  <div class="drawer-top">
+    <div class="drawer-brand secret-trigger" onclick="handleSecretTap()">
+      <span id="drawerAvatarSlot"></span>
+      <span>Multi-AI Hub</span>
+      <span class="dev-badge dev-only-inline">DEV</span>
+    </div>
+    <button class="close-pill" onclick="toggleDrawer(false)">✕</button>
+  </div>
+
+  <button class="drawer-new-btn" onclick="startNewChat(); toggleDrawer(false);">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+    പുതിയ ചാറ്റ് തുടങ്ങുക
+  </button>
+
+  <div class="drawer-section-label">
+    <span>പഴയ ചാറ്റുകൾ</span>
+    <button style="background:none;border:none;color:var(--red);font-size:13px;cursor:pointer;" onclick="clearAllSessions()">എല്ലാം മായ്ക്കുക</button>
+  </div>
+
+  <div class="drawer-history" id="historyList"></div>
+
+  <div class="drawer-footer">
+    <button class="drawer-foot-btn dev-only" onclick="toggleDrawer(false); openSettings();">സെറ്റിംഗ്സ്</button>
+    <button class="drawer-foot-btn dev-only" onclick="exitDevMode()">Dev ലോക്ക്</button>
+    <button class="drawer-foot-btn" onclick="toggleDrawer(false); logout();">ലോക്ക്</button>
+  </div>
+</aside>
+
+<!-- Secret Developer PIN Unlock Modal -->
+<div class="modal-bg center-modal" id="devPinModal" onclick="if(event.target===this) closeModal('devPinModal')">
+  <div class="sheet" style="max-width:360px;">
+    <div class="sheet-head">
+      <h3>Developer Access</h3>
+      <button class="close-pill" onclick="closeModal('devPinModal')">✕</button>
+    </div>
+    <p style="font-size:14px;color:var(--text-soft);margin-bottom:12px;">സെറ്റിംഗ്സ് & പ്രൊഫൈൽ തുറക്കാൻ Developer PIN നൽകുക.</p>
+    <input type="password" id="devPinInput" class="input-field" placeholder="Developer PIN" onkeydown="if(event.key==='Enter') verifyDevPin()">
+    <div class="err-msg" id="devPinErr" style="margin-top:4px;"></div>
+    <button class="btn-primary" onclick="verifyDevPin()">അൺലോക്ക് ചെയ്യുക</button>
+  </div>
+</div>
+
+<!-- Quick Model & Options Bottom Sheet (Developer Only) -->
+<div class="modal-bg" id="quickSheet" onclick="if(event.target===this) closeModal('quickSheet')">
+  <div class="sheet">
+    <div class="sheet-head">
+      <h3>മോഡലുകളും ഓപ്ഷനുകളും</h3>
+      <button class="close-pill" onclick="closeModal('quickSheet')">✕</button>
+    </div>
+
+    <label class="toggle-row">
+      <div>
+        <span>ശുദ്ധമായ മലയാളം മാത്രം</span>
+        <small>അക്ഷരത്തെറ്റും മറ്റ് ഭാഷകളും കലരാത്ത മലയാളം ഉത്തരം</small>
+      </div>
+      <input type="checkbox" id="mlOnlyToggle" checked onchange="saveQuickPrefs()">
+    </label>
+
+    <label class="toggle-row">
+      <div>
+        <span>Multi-AI സംഗ്രഹ മോഡ് (കൂടുതൽ ക്വാട്ട വേണം)</span>
+        <small>ഓഫ് ആക്കിയാൽ Smart Fallback വഴി 1 റിക്വസ്റ്റിൽ വേഗത്തിൽ ഉത്തരം കിട്ടും</small>
+      </div>
+      <input type="checkbox" id="multiModeToggle" onchange="saveQuickPrefs()">
+    </label>
+
+    <label class="field-label">പ്രധാന / സംഗ്രഹ മോഡൽ</label>
+    <select id="synthModelSelect" class="select-field" onchange="saveQuickPrefs()"></select>
+
+    <label class="field-label">സജീവ മോഡലുകൾ (Fallback ലിസ്റ്റ്)</label>
+    <div id="quickModelsList"></div>
+
+    <div style="display:flex; gap:8px; margin-top:10px;">
+      <button class="preset-btn" onclick="closeModal('quickSheet'); openSettings();">സെറ്റിംഗ്സ് & പ്രൊഫൈൽ</button>
+      <button class="preset-btn" onclick="closeModal('quickSheet'); startNewChat();">+ പുതിയ ചാറ്റ്</button>
+    </div>
+  </div>
+</div>
+
+<!-- Developer Settings & Profile Modal (Developer Only) -->
+<div class="modal-bg center-modal" id="settingsModal" onclick="if(event.target===this) closeModal('settingsModal')">
+  <div class="sheet">
+    <div class="sheet-head">
+      <h3>ഡെവലപ്പർ സെറ്റിംഗ്സ് & പ്രൊഫൈൽ</h3>
+      <button class="close-pill" onclick="closeModal('settingsModal')">✕</button>
+    </div>
+
+    <label class="field-label">ചാറ്റ് റൗണ്ട് ഐക്കൺ ഫോട്ടോ</label>
+    <div class="avatar-upload-card">
+      <div id="settingsAvatarPreview"></div>
+      <div class="avatar-upload-actions">
+        <small>ഗാലറിയിൽ നിന്ന് ഫോട്ടോ തിരഞ്ഞെടുക്കുകയോ GitHub-ൽ avatar.jpg അപ്‌ലോഡ് ചെയ്യുകയോ ചെയ്യാം.</small>
+        <div class="upload-btn-row">
+          <label class="preset-btn" style="cursor:pointer;">
+            ഫോട്ടോ തിരഞ്ഞെടുക്കുക
+            <input type="file" accept="image/*" style="display:none;" onchange="handleAvatarUpload(event)">
+          </label>
+          <button class="preset-btn" type="button" style="flex:0 0 auto;" onclick="resetAvatar()">റീസെറ്റ്</button>
+        </div>
+      </div>
+    </div>
+
+    <label class="field-label">നിങ്ങളുടെ പേര് (Greeting)</label>
+    <input type="text" id="setUserName" class="input-field" placeholder="Shamsu">
+
+    <label class="field-label">Developer PIN (സെറ്റിംഗ്സ് തുറക്കാൻ)</label>
+    <input type="password" id="setDevPin" class="input-field" placeholder="പുതിയ PIN നൽകുക">
+
+    <label class="field-label">Cloudflare Worker URL</label>
+    <input type="url" id="setWorkerUrl" class="input-field">
+
+    <div class="preset-row">
+      <button class="preset-btn" onclick="applyPreset('free')">Free മോഡലുകൾ</button>
+      <button class="preset-btn" onclick="applyPreset('paid')">Paid മോഡലുകൾ</button>
+    </div>
+    <div id="modelSettingsInputs"></div>
+    <button class="btn-primary" onclick="saveSettings()">സേവ് ചെയ്യുക</button>
   </div>
 </div>
 
@@ -212,83 +1122,578 @@
 
 <script>
 const DEFAULT_WORKER_URL = "https://multi-ai-proxy.shamsushaz14.workers.dev";
+const DEFAULT_AVATAR_PATH = "./avatar.jpg";
+const DEFAULT_DEV_PIN = "1414";
+const BEST_ML_MODEL_ID = "google/gemma-4-31b-it:free";
 const MAX_CONTEXT_TURNS = 6;
 const MAX_SAVED_SESSIONS = 30;
 
+const STARBURST_SVG = `<svg viewBox="0 0 64 64" fill="none"><path d="M32 6v20M32 38v20M6 32h20M38 32h20M13.6 13.6l14.2 14.2M36.2 36.2l14.2 14.2M50.4 13.6L36.2 27.8M27.8 36.2L13.6 50.4M22 8.2l7.5 18.2M34.5 37.6L42 55.8M8.2 42l18.2-7.5M37.6 29.5L55.8 22" stroke="currentColor" stroke-width="4.2" stroke-linecap="round"/></svg>`;
+
+const TEAL_SPARKLE_SVG = `<svg class="thinking-sparkle" viewBox="0 0 28 28" fill="none"><path d="M14 2C14.8 9.2 18.8 13.2 26 14C18.8 14.8 14.8 18.8 14 26C13.2 18.8 9.2 14.8 2 14C9.2 13.2 13.2 9.2 14 2Z" fill="url(#tealSparkGrad)"/></svg>`;
+
+const THINKING_HTML = `<div class="thinking-row"><div class="thinking-sparkle-wrap"><span class="thinking-glow"></span>${TEAL_SPARKLE_SVG}</div><span class="thinking-label">Thinking</span></div>`;
+
+const SPEAKER_ICON_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>`;
+const STOP_ICON_SVG = `<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"></rect></svg>`;
+const COPY_ICON_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
+
 const PRESETS = {
-  paid: [
-    { key: "claude",   name: "Claude",   id: "anthropic/claude-sonnet-4", enabled: true },
-    { key: "gemini",   name: "Gemini",   id: "google/gemini-2.5-pro",     enabled: true },
-    { key: "chatgpt",  name: "ChatGPT",  id: "openai/gpt-4o",             enabled: true },
-    { key: "grok",     name: "Grok",     id: "x-ai/grok-3",               enabled: true },
-    { key: "deepseek", name: "DeepSeek", id: "deepseek/deepseek-chat",    enabled: true }
-  ],
   free: [
-    { key: "claude",   name: "Llama Free",    id: "meta-llama/llama-3.3-70b-instruct:free",        enabled: true },
-    { key: "gemini",   name: "Gemini Free",   id: "google/gemini-2.0-flash-exp:free",              enabled: true },
-    { key: "chatgpt",  name: "Qwen Free",     id: "qwen/qwen-2.5-72b-instruct:free",               enabled: true },
-    { key: "grok",     name: "Mistral Free",  id: "mistralai/mistral-small-3.1-24b-instruct:free", enabled: true },
-    { key: "deepseek", name: "DeepSeek Free", id: "deepseek/deepseek-r1:free",                     enabled: true }
+    { key: "m1", name: "Gemma 4 31B",    id: "google/gemma-4-31b-it:free",             enabled: true },
+    { key: "m2", name: "Nemotron Ultra", id: "nvidia/nemotron-3-ultra-550b-a55b:free", enabled: true },
+    { key: "m3", name: "ERNIE 5.5",      id: "baidu/ernie-5.5-flash-preview:free",     enabled: true },
+    { key: "m4", name: "Nemotron Super", id: "nvidia/nemotron-3.5-super-vl:free",      enabled: true },
+    { key: "m5", name: "Particle-1",     id: "particle-ai/particle-1:free",            enabled: true }
+  ],
+  paid: [
+    { key: "m1", name: "Gemini",   id: "google/gemini-2.5-pro",     enabled: true },
+    { key: "m2", name: "Claude",   id: "anthropic/claude-sonnet-4", enabled: true },
+    { key: "m3", name: "ChatGPT",  id: "openai/gpt-4o",             enabled: true },
+    { key: "m4", name: "Grok",     id: "x-ai/grok-3",               enabled: true },
+    { key: "m5", name: "DeepSeek", id: "deepseek/deepseek-chat",    enabled: true }
   ]
 };
 
 function cloneObj(o) { return JSON.parse(JSON.stringify(o)); }
 
 let state = {
+  userName: localStorage.getItem("mai_username") || "Shamsu",
+  customAvatar: localStorage.getItem("mai_avatar") || "",
+  devPin: localStorage.getItem("mai_dev_pin") || DEFAULT_DEV_PIN,
+  devMode: false,
   workerUrl: localStorage.getItem("mai_worker") || DEFAULT_WORKER_URL,
   pin: localStorage.getItem("mai_pin") || "",
-  models: JSON.parse(localStorage.getItem("mai_models") || "null") || cloneObj(PRESETS.free),
+  models: JSON.parse(localStorage.getItem("mai_models_v3") || "null") || cloneObj(PRESETS.free),
+  synthModelId: localStorage.getItem("mai_synth_id_v2") || BEST_ML_MODEL_ID,
+  mlOnly: localStorage.getItem("mai_ml_only") !== "false",
+  multiMode: localStorage.getItem("mai_multi_mode") === "true", // Default false = Smart 1-call Auto-Fallback
   sessions: JSON.parse(localStorage.getItem("mai_sessions_v2") || "[]"),
   currentSessionId: null,
+  incognito: false,
   isRunning: false
 };
+
+let recognition = null;
+let isListening = false;
+let secretTapCount = 0;
+let secretTapTimer = null;
+
+/* Text-to-Speech (Working Speaker Engine for Malayalam & English) */
+let ttsVoices = [];
+let ttsActiveBtnId = null;
+let ttsSessionToken = 0;
+
+function loadTtsVoices() {
+  if (!("speechSynthesis" in window)) return;
+  ttsVoices = window.speechSynthesis.getVoices() || [];
+}
+if ("speechSynthesis" in window) {
+  loadTtsVoices();
+  window.speechSynthesis.onvoiceschanged = loadTtsVoices;
+}
+
+function stopSpeaking() {
+  ttsSessionToken++;
+  if ("speechSynthesis" in window) {
+    try { window.speechSynthesis.cancel(); } catch (e) {}
+  }
+  if (ttsActiveBtnId) {
+    const btn = document.getElementById(ttsActiveBtnId);
+    if (btn) {
+      btn.classList.remove("speaking");
+      btn.innerHTML = SPEAKER_ICON_SVG;
+    }
+    ttsActiveBtnId = null;
+  }
+}
+
+function cleanTextForSpeech(raw) {
+  return String(raw || "")
+    .replace(/https?:\/\/\S+/g, "")
+    .replace(/[`*_#~>|]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function splitSpeechChunks(text, maxLen = 190) {
+  const sentences = text.split(/(?<=[.!?।\n])\s+/);
+  const chunks = [];
+  for (const s of sentences) {
+    const trimmed = s.trim();
+    if (!trimmed) continue;
+    if (trimmed.length <= maxLen) {
+      chunks.push(trimmed);
+    } else {
+      const words = trimmed.split(/\s+/);
+      let current = "";
+      for (const w of words) {
+        if ((current + " " + w).trim().length > maxLen) {
+          if (current) chunks.push(current.trim());
+          current = w;
+        } else {
+          current = (current + " " + w).trim();
+        }
+      }
+      if (current) chunks.push(current.trim());
+    }
+  }
+  return chunks;
+}
+
+function pickBestVoice(isMalayalam) {
+  if (!ttsVoices.length) loadTtsVoices();
+  if (isMalayalam) {
+    return (
+      ttsVoices.find(v => v.lang && v.lang.toLowerCase() === "ml-in") ||
+      ttsVoices.find(v => v.lang && v.lang.toLowerCase().startsWith("ml")) ||
+      null
+    );
+  }
+  return (
+    ttsVoices.find(v => v.lang && v.lang.toLowerCase() === "en-in") ||
+    ttsVoices.find(v => v.lang && v.lang.toLowerCase().startsWith("en")) ||
+    null
+  );
+}
+
+function toggleSpeak(bodyElId, btnId) {
+  if (!("speechSynthesis" in window)) {
+    return showToast("ഈ ബ്രൗസറിൽ സ്പീക്കർ സൗകര്യം ലഭ്യമല്ല");
+  }
+
+  if (ttsActiveBtnId === btnId) {
+    stopSpeaking();
+    return;
+  }
+
+  const bodyEl = document.getElementById(bodyElId);
+  if (!bodyEl) return;
+  const text = cleanTextForSpeech(bodyEl.innerText);
+  if (!text) return showToast("വായിക്കാൻ ഉള്ളടക്കം ഒന്നുമില്ല");
+
+  stopSpeaking();
+  const myToken = ++ttsSessionToken;
+  ttsActiveBtnId = btnId;
+
+  const btn = document.getElementById(btnId);
+  if (btn) {
+    btn.classList.add("speaking");
+    btn.innerHTML = STOP_ICON_SVG;
+  }
+
+  const isMalayalam = /[\u0D00-\u0D7F]/.test(text);
+  const voice = pickBestVoice(isMalayalam);
+  const chunks = splitSpeechChunks(text, 190);
+  let idx = 0;
+
+  const speakNext = () => {
+    if (myToken !== ttsSessionToken) return;
+    if (idx >= chunks.length) {
+      stopSpeaking();
+      return;
+    }
+    const utt = new SpeechSynthesisUtterance(chunks[idx++]);
+    utt.lang = isMalayalam ? "ml-IN" : "en-IN";
+    if (voice) utt.voice = voice;
+    utt.rate = 0.98;
+    utt.pitch = 1.0;
+
+    utt.onend = () => {
+      if (myToken === ttsSessionToken) speakNext();
+    };
+    utt.onerror = () => {
+      if (myToken === ttsSessionToken) stopSpeaking();
+    };
+    window.speechSynthesis.speak(utt);
+  };
+
+  setTimeout(speakNext, 60);
+}
+
+/* Right-Side Floating Buttons Helpers */
+function getVisibleCompletedTurn() {
+  const session = getCurrentSession();
+  const doneTurns = session.turns.filter(t => t.finalStatus === "done" && t.finalText);
+  if (doneTurns.length === 0) return null;
+  if (doneTurns.length === 1) return doneTurns[0];
+
+  const thread = document.getElementById("chatThread");
+  const rect = thread.getBoundingClientRect();
+  const midY = rect.top + rect.height * 0.45;
+
+  let bestTurn = doneTurns[doneTurns.length - 1];
+  let bestDist = Infinity;
+
+  doneTurns.forEach(t => {
+    const el = document.getElementById(`turn-${t.id}`);
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const isVisible = r.bottom > rect.top + 20 && r.top < rect.bottom - 20;
+    if (isVisible) {
+      const center = (Math.max(r.top, rect.top) + Math.min(r.bottom, rect.bottom)) / 2;
+      const dist = Math.abs(center - midY);
+      if (dist < bestDist) {
+        bestDist = dist;
+        bestTurn = t;
+      }
+    }
+  });
+  return bestTurn;
+}
+
+function updateSideFloatActions() {
+  const box = document.getElementById("sideFloatActions");
+  const session = getCurrentSession();
+  const hasDone = session.turns.some(t => t.finalStatus === "done" && t.finalText);
+  box.classList.toggle("visible", hasDone);
+}
+
+function speakVisibleAnswer() {
+  if (ttsActiveBtnId === "floatSpeakBtn") {
+    stopSpeaking();
+    return;
+  }
+  const turn = getVisibleCompletedTurn();
+  if (!turn) return showToast("വായിക്കാൻ ഉത്തരമൊന്നുമില്ല");
+  toggleSpeak(`final-body-${turn.id}`, "floatSpeakBtn");
+}
+
+function copyVisibleAnswer() {
+  const turn = getVisibleCompletedTurn();
+  if (!turn) return showToast("കോപ്പി ചെയ്യാൻ ഉത്തരമൊന്നുമില്ല");
+  copyById(`final-body-${turn.id}`);
+}
+
+window.addEventListener("beforeunload", stopSpeaking);
+
+/* Smart Error Diagnosis */
+function formatFriendlyError(errors) {
+  const joined = errors.filter(Boolean).join(" | ");
+  const low = joined.toLowerCase();
+  if (low.includes("free-models-per-day") || (low.includes("429") && low.includes("day"))) {
+    return {
+      title: "ഇന്നത്തെ OpenRouter സൗജന്യ പരിധി (50 റിക്വസ്റ്റുകൾ) തീർന്നു. നാളെ രാവിലെ 5:30-ന് വീണ്ടും പുതുക്കും — അല്ലെങ്കിൽ പുതിയ API Key നൽകാം.",
+      raw: errors[0] || ""
+    };
+  }
+  if (low.includes("429") || low.includes("rate limit") || low.includes("too many requests")) {
+    return {
+      title: "സൗജന്യ സെർവറിൽ താൽക്കാലിക തിരക്കാണ് (Rate Limit). 1 മിനിറ്റ് കഴിഞ്ഞ് വീണ്ടും ശ്രമിക്കുക.",
+      raw: errors[0] || ""
+    };
+  }
+  if (low.includes("failed to fetch") || low.includes("networkerror") || low.includes("load failed")) {
+    return {
+      title: "നെറ്റ്‌വർക്ക് അല്ലെങ്കിൽ Cloudflare Worker ബന്ധം ലഭിച്ചില്ല. ഇന്റർനെറ്റ് പരിശോധിക്കുക.",
+      raw: errors[0] || ""
+    };
+  }
+  return {
+    title: "ഉത്തരം ലഭിച്ചില്ല. അല്പം കഴിഞ്ഞ് വീണ്ടും ശ്രമിക്കുക.",
+    raw: errors[0] || ""
+  };
+}
+
+/* Secret 5-Tap Developer Unlock */
+function handleSecretTap() {
+  if (state.devMode) {
+    openSettings();
+    return;
+  }
+  secretTapCount++;
+  clearTimeout(secretTapTimer);
+  secretTapTimer = setTimeout(() => { secretTapCount = 0; }, 2200);
+
+  if (secretTapCount >= 5) {
+    secretTapCount = 0;
+    document.getElementById("devPinInput").value = "";
+    document.getElementById("devPinErr").textContent = "";
+    document.getElementById("devPinModal").style.display = "flex";
+    setTimeout(() => document.getElementById("devPinInput").focus(), 100);
+  }
+}
+
+function verifyDevPin() {
+  const entered = document.getElementById("devPinInput").value.trim();
+  const err = document.getElementById("devPinErr");
+  if (entered === state.devPin) {
+    state.devMode = true;
+    document.body.classList.add("dev-unlocked");
+    closeModal("devPinModal");
+    showToast("ഡെവലപ്പർ മോഡ് അൺലോക്ക് ചെയ്തു");
+    if (!state.isRunning) renderChatThread();
+  } else {
+    err.textContent = "തെറ്റായ Developer PIN";
+  }
+}
+
+function exitDevMode() {
+  state.devMode = false;
+  document.body.classList.remove("dev-unlocked");
+  closeModal("settingsModal");
+  closeModal("quickSheet");
+  toggleDrawer(false);
+  if (!state.isRunning) renderChatThread();
+  showToast("ഡെവലപ്പർ മോഡ് ലോക്ക് ചെയ്തു");
+}
+
+function handlePlusClick() {
+  if (state.devMode) openQuickSheet();
+  else startNewChat();
+}
+
+/* Malayalam Script Cleanup & Corruption Detector */
+function cleanMalayalamText(text) {
+  if (!text) return "";
+  return text
+    .replace(/([\u0D05-\u0D39])\s+([\u0D3E-\u0D4D\u0D57\u0D02\u0D03])/g, "$1$2")
+    .replace(/\u25CC/g, "")
+    .trim();
+}
+
+function getMalayalamGlitchScore(text) {
+  if (!text) return 999;
+  let score = 0;
+  const foreign = text.match(/[\uAC00-\uD7AF\u1100-\u11FF\u4E00-\u9FFF\u3040-\u30FF\u0400-\u04FF\u0900-\u097F\u0600-\u06FF]/g);
+  if (foreign) score += foreign.length * 6;
+  const mixed = text.match(/[\u0D00-\u0D7F][A-Za-z]+|[A-Za-z]+[\u0D00-\u0D7F]/g);
+  if (mixed) score += mixed.length * 4;
+  const brokenMarks = text.match(/(?:^|[\s([{"'])[\u0D3E-\u0D4D\u0D57]/g);
+  if (brokenMarks) score += brokenMarks.length * 3;
+  return score;
+}
+
+const STRICT_ML_RULES = `STRICT MALAYALAM SCRIPT RULES:
+1. Write ONLY in pure, natural, grammatically correct Malayalam Unicode script (ശുദ്ധമായ മലയാളം).
+2. NEVER mix English/Latin letters inside Malayalam words (for example, NEVER write things like "പൂRNമായും" or "കുതirthൽ").
+3. NEVER use any Korean, Chinese, Japanese, Hindi, or other foreign characters.
+4. NEVER put spaces before Malayalam vowel signs or chandrakkala (avoid broken characters like "ന ിർത്തുക" or "മ ിശ്രിച്ചോ").
+5. Avoid unnecessary English words in brackets; use natural Malayalam words everywhere unless a technical term has no Malayalam equivalent.`;
+
+function getAvatarSrc() {
+  return state.customAvatar || DEFAULT_AVATAR_PATH;
+}
+
+function getAvatarHtml(sizeClass) {
+  return `<img src="${getAvatarSrc()}" alt="Icon" class="avatar-circle ${sizeClass}" onerror="this.onerror=null;this.style.display='none';if(this.nextElementSibling)this.nextElementSibling.style.display='inline-flex';"><span class="avatar-fallback ${sizeClass}" style="display:none;">${STARBURST_SVG}</span>`;
+}
+
+function updateStaticAvatars() {
+  const loginSlot = document.getElementById("loginAvatarSlot");
+  const drawerSlot = document.getElementById("drawerAvatarSlot");
+  const previewSlot = document.getElementById("settingsAvatarPreview");
+  if (loginSlot) loginSlot.innerHTML = getAvatarHtml("av-login");
+  if (drawerSlot) drawerSlot.innerHTML = getAvatarHtml("av-drawer");
+  if (previewSlot) previewSlot.innerHTML = getAvatarHtml("av-preview");
+}
+
+function handleAvatarUpload(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      const size = 256;
+      const canvas = document.createElement("canvas");
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, size, size);
+      const minSide = Math.min(img.width, img.height);
+      const sx = (img.width - minSide) / 2;
+      const sy = Math.max(0, (img.height - minSide) * 0.15);
+      ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, size, size);
+      const dataUrl = canvas.toDataURL("image/jpeg", 0.88);
+      state.customAvatar = dataUrl;
+      localStorage.setItem("mai_avatar", dataUrl);
+      updateStaticAvatars();
+      if (!state.isRunning) renderChatThread();
+      showToast("റൗണ്ട് ഐക്കൺ സേവ് ചെയ്തു!");
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+  event.target.value = "";
+}
+
+function resetAvatar() {
+  state.customAvatar = "";
+  localStorage.removeItem("mai_avatar");
+  updateStaticAvatars();
+  if (!state.isRunning) renderChatThread();
+  showToast("ഡിഫോൾട്ട് avatar.jpg-ലേക്ക് മാറ്റി");
+}
 
 window.addEventListener("DOMContentLoaded", () => {
   document.getElementById("loginWorkerUrl").value = state.workerUrl;
   if (state.pin && state.workerUrl) {
     document.getElementById("loginScreen").style.display = "none";
   }
-  renderModelChips();
-  if (state.sessions.length > 0) state.currentSessionId = state.sessions[0].id;
-  else createFreshSession();
-  renderChatThread();
 
+  document.getElementById("mlOnlyToggle").checked = state.mlOnly;
+  document.getElementById("multiModeToggle").checked = state.multiMode;
+  updateStaticAvatars();
+  renderModelControls();
+  createFreshSession();
+  renderChatThread();
+  renderHistoryList();
+  setupComposerBehavior();
+});
+
+function getGreetingText() {
+  const hr = new Date().getHours();
+  let part = "Good evening";
+  if (hr >= 4 && hr < 12) part = "Good morning";
+  else if (hr >= 12 && hr < 17) part = "Good afternoon";
+  return `${part}, ${state.userName}`;
+}
+
+function setupComposerBehavior() {
+  const box = document.getElementById("composerBox");
   const ta = document.getElementById("promptInput");
+
+  const expand = () => {
+    box.classList.add("expanded");
+    ta.placeholder = "Chat with Multi-AI";
+  };
+  const maybeCollapse = () => {
+    if (!ta.value.trim()) {
+      box.classList.remove("expanded");
+      ta.placeholder = "Type or hold to talk";
+      ta.style.height = "auto";
+    }
+  };
+
+  ta.addEventListener("focus", expand);
+  document.addEventListener("click", (e) => {
+    if (!box.contains(e.target) && document.activeElement !== ta) {
+      maybeCollapse();
+    }
+  });
+
   ta.addEventListener("input", () => {
     ta.style.height = "auto";
     ta.style.height = Math.min(ta.scrollHeight, 140) + "px";
+    updateSendButtonState();
+    if (ta.value.trim()) expand();
   });
-  ta.addEventListener("keydown", (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") { e.preventDefault(); sendMessage(); }
-  });
-});
 
+  ta.addEventListener("keydown", (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
+  updateSendButtonState();
+}
+
+function updateSendButtonState() {
+  const hasText = document.getElementById("promptInput").value.trim().length > 0;
+  const btn = document.getElementById("sendBtn");
+  document.getElementById("waveIcon").style.display = hasText ? "none" : "block";
+  document.getElementById("arrowIcon").style.display = hasText ? "block" : "none";
+  btn.classList.toggle("ready-send", hasText);
+}
+
+function handlePrimaryAction() {
+  const text = document.getElementById("promptInput").value.trim();
+  if (text) sendMessage();
+  else toggleVoice();
+}
+
+/* Voice Input */
+function toggleVoice() {
+  stopSpeaking();
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRec) return showToast("ഈ ബ്രൗസറിൽ വോയ്‌സ് ടൈപ്പിംഗ് ലഭ്യമല്ല");
+
+  const micBtn = document.getElementById("micBtn");
+  if (isListening && recognition) {
+    recognition.stop();
+    return;
+  }
+
+  recognition = new SpeechRec();
+  recognition.lang = state.mlOnly ? "ml-IN" : "en-IN";
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  recognition.onstart = () => {
+    isListening = true;
+    micBtn.classList.add("recording");
+    showToast("സംസാരിക്കൂ...");
+  };
+  recognition.onresult = (e) => {
+    const spoken = e.results[0][0].transcript;
+    const ta = document.getElementById("promptInput");
+    ta.value = (ta.value ? ta.value + " " : "") + spoken;
+    ta.focus();
+    ta.dispatchEvent(new Event("input"));
+  };
+  recognition.onerror = () => showToast("വോയ്‌സ് തിരിച്ചറിയാനായില്ല");
+  recognition.onend = () => {
+    isListening = false;
+    micBtn.classList.remove("recording");
+  };
+  recognition.start();
+}
+
+/* Sessions & Navigation */
 function getCurrentSession() {
+  if (state.incognito && state.tempSession) return state.tempSession;
   let s = state.sessions.find(x => x.id === state.currentSessionId);
   if (!s) s = createFreshSession();
   return s;
 }
+
 function createFreshSession() {
   const s = { id: "chat_" + Date.now(), title: "പുതിയ ചാറ്റ്", updatedAt: new Date().toLocaleString("ml-IN"), turns: [] };
-  state.currentSessionId = s.id;
+  if (state.incognito) state.tempSession = s;
+  else state.currentSessionId = s.id;
   return s;
 }
+
 function saveCurrentSession(session) {
+  if (state.incognito) return;
   session.updatedAt = new Date().toLocaleString("ml-IN");
   const idx = state.sessions.findIndex(x => x.id === session.id);
   if (idx >= 0) state.sessions.splice(idx, 1);
   state.sessions.unshift(session);
   state.sessions = state.sessions.slice(0, MAX_SAVED_SESSIONS);
   localStorage.setItem("mai_sessions_v2", JSON.stringify(state.sessions));
-}
-function startNewChat() {
-  if (state.isRunning) return showToast("ഇപ്പോഴത്തെ ഉത്തരം പൂർത്തിയാകട്ടെ...");
-  createFreshSession();
-  renderChatThread();
-  document.getElementById("promptInput").focus();
-  showToast("പുതിയ ചാറ്റ് തുടങ്ങി");
+  renderHistoryList();
 }
 
+function startNewChat() {
+  if (state.isRunning) return showToast("ഇപ്പോഴത്തെ ഉത്തരം പൂർത്തിയാകട്ടെ...");
+  stopSpeaking();
+  createFreshSession();
+  renderChatThread();
+  showToast("പുതിയ ചാറ്റ്");
+}
+
+function toggleIncognito() {
+  if (state.isRunning) return showToast("ഇപ്പോഴത്തെ ഉത്തരം പൂർത്തിയാകട്ടെ...");
+  stopSpeaking();
+  state.incognito = !state.incognito;
+  document.getElementById("ghostBtn").classList.toggle("ghost-active", state.incognito);
+  document.getElementById("incognitoBadge").style.display = state.incognito ? "inline-block" : "none";
+  createFreshSession();
+  renderChatThread();
+  showToast(state.incognito ? "പ്രൈവറ്റ് ചാറ്റ് ഓൺ (സേവ് ആകില്ല)" : "സാധാരണ ചാറ്റിലേക്ക് മാറി");
+}
+
+function toggleDrawer(open) {
+  document.getElementById("sideDrawer").classList.toggle("open", open);
+  document.getElementById("drawerBackdrop").classList.toggle("open", open);
+  if (open) renderHistoryList();
+}
+
+/* Login */
 async function doLogin() {
   const url = document.getElementById("loginWorkerUrl").value.trim().replace(/\/$/, "");
   const pin = document.getElementById("loginPin").value.trim();
@@ -310,73 +1715,177 @@ async function doLogin() {
   } catch (e) { errEl.textContent = e.message; }
   finally { btn.disabled = false; }
 }
+
 function logout() {
-  localStorage.removeItem("mai_pin"); state.pin = "";
+  stopSpeaking();
+  state.devMode = false;
+  document.body.classList.remove("dev-unlocked");
+  localStorage.removeItem("mai_pin");
+  state.pin = "";
   document.getElementById("loginPin").value = "";
   document.getElementById("loginWorkerUrl").value = state.workerUrl;
   document.getElementById("loginScreen").style.display = "flex";
 }
 
-function renderModelChips() {
-  const bar = document.getElementById("modelsBar");
+/* Models UI */
+function renderModelControls() {
   const synthSel = document.getElementById("synthModelSelect");
-  const prevSynth = synthSel.value;
-  bar.innerHTML = ""; synthSel.innerHTML = "";
+  const quickList = document.getElementById("quickModelsList");
+  synthSel.innerHTML = "";
+  quickList.innerHTML = "";
+
   state.models.forEach((m, idx) => {
-    const label = document.createElement("label");
-    label.className = "model-chip" + (m.enabled ? " active" : "");
-    label.innerHTML = `<input type="checkbox" ${m.enabled ? "checked" : ""}> ${escapeHtml(m.name)}`;
-    label.querySelector("input").addEventListener("change", (e) => {
-      state.models[idx].enabled = e.target.checked;
-      label.classList.toggle("active", e.target.checked);
-      localStorage.setItem("mai_models", JSON.stringify(state.models));
-    });
-    bar.appendChild(label);
     const opt = document.createElement("option");
     opt.value = m.id; opt.textContent = m.name;
     synthSel.appendChild(opt);
+
+    const row = document.createElement("label");
+    row.className = "toggle-row";
+    row.innerHTML = `<div><span>${escapeHtml(m.name)}</span><small>${escapeHtml(m.id)}</small></div><input type="checkbox" ${m.enabled ? "checked" : ""}>`;
+    row.querySelector("input").addEventListener("change", (e) => {
+      state.models[idx].enabled = e.target.checked;
+      localStorage.setItem("mai_models_v3", JSON.stringify(state.models));
+      updateModelPillLabel();
+    });
+    quickList.appendChild(row);
   });
-  if (prevSynth && [...synthSel.options].some(o => o.value === prevSynth)) synthSel.value = prevSynth;
+
+  if ([...synthSel.options].some(o => o.value === state.synthModelId)) {
+    synthSel.value = state.synthModelId;
+  } else if (state.models.length > 0) {
+    const gemma = state.models.find(m => m.id.toLowerCase().includes("gemma") || m.id.toLowerCase().includes("gemini"));
+    state.synthModelId = gemma ? gemma.id : state.models[0].id;
+    synthSel.value = state.synthModelId;
+  }
+  updateModelPillLabel();
 }
 
+function updateModelPillLabel() {
+  const activeCount = state.models.filter(m => m.enabled).length;
+  const synthObj = state.models.find(m => m.id === state.synthModelId) || state.models[0];
+  const shortName = synthObj ? synthObj.name : "Multi-AI";
+  document.getElementById("modelPillLabel").textContent = state.multiMode
+    ? `${activeCount} AI · ${shortName}`
+    : `Smart · ${shortName}`;
+}
+
+function saveQuickPrefs() {
+  state.mlOnly = document.getElementById("mlOnlyToggle").checked;
+  state.multiMode = document.getElementById("multiModeToggle").checked;
+  state.synthModelId = document.getElementById("synthModelSelect").value;
+  localStorage.setItem("mai_ml_only", String(state.mlOnly));
+  localStorage.setItem("mai_multi_mode", String(state.multiMode));
+  localStorage.setItem("mai_synth_id_v2", state.synthModelId);
+  updateModelPillLabel();
+}
+
+/* Chat Rendering */
 function renderChatThread() {
   const thread = document.getElementById("chatThread");
+  const headerCenter = document.getElementById("headerCenter");
   const session = getCurrentSession();
-  updateContextHint(session);
+
   if (session.turns.length === 0) {
-    thread.innerHTML = `<div class="empty-state"><h2>മലയാളം Multi-AI ചാറ്റ്</h2><p>നിങ്ങളുടെ ചോദ്യം താഴെ ടൈപ്പ് ചെയ്യുക. തിരഞ്ഞെടുത്ത എല്ലാ AI മോഡലുകളുടെയും ഉത്തരങ്ങൾ ഒത്തുനോക്കി കൃത്യമായ അന്തിമ ഉത്തരം ലഭിക്കും — തുടർചോദ്യങ്ങളും ചോദിക്കാം.</p></div>`;
+    thread.classList.remove("has-turns");
+    headerCenter.classList.toggle("visible", state.incognito);
+    const activeCount = state.models.filter(m => m.enabled).length;
+    thread.innerHTML = `
+      <div class="welcome-wrap">
+        <div class="secret-trigger" onclick="handleSecretTap()">${getAvatarHtml("av-welcome")}</div>
+        <h1 class="greeting-title">${escapeHtml(getGreetingText())}</h1>
+        <button class="plan-pill dev-only-inline" onclick="openQuickSheet()">
+          <span>${state.multiMode ? `${activeCount} Multi-AI` : "Smart Fallback"}</span> · <strong>Settings</strong>
+        </button>
+      </div>`;
+    updateSideFloatActions();
     return;
   }
+
+  thread.classList.add("has-turns");
+  headerCenter.classList.add("visible");
+  document.getElementById("headerTitle").textContent = session.title.slice(0, 24);
   thread.innerHTML = "";
   session.turns.forEach(turn => thread.appendChild(buildTurnElement(turn, false)));
+  updateSideFloatActions();
   scrollToBottom();
+}
+
+function renderFinalInnerHtml(turn) {
+  if (turn.finalStatus === "loading") {
+    return THINKING_HTML;
+  }
+
+  const finalStatusClass = turn.finalStatus === "done" ? "done" : "fail";
+  const rawNote = turn.finalRawError
+    ? `<div class="error-detail-note">${escapeHtml(turn.finalRawError)}</div>`
+    : "";
+  const finalBodyHtml = turn.finalStatus === "done"
+    ? renderMarkdown(turn.finalText)
+    : `<div style="color:var(--red);">${escapeHtml(turn.finalError || "ഉത്തരം ലഭിച്ചില്ല")}</div>${rawNote}`;
+
+  return `
+    <div class="final-head">
+      <div class="final-brand">
+        ${getAvatarHtml("av-chat")}
+        <span class="badge ${finalStatusClass} dev-only-inline">${escapeHtml(turn.finalBadge || "")}</span>
+      </div>
+    </div>
+    <div class="ai-body" id="final-body-${turn.id}">${finalBodyHtml}</div>`;
+}
+
+function updateTurnFinalUI(turn) {
+  const el = document.getElementById(`final-wrap-${turn.id}`);
+  if (el) el.innerHTML = renderFinalInnerHtml(turn);
+  updateSideFloatActions();
 }
 
 function buildTurnElement(turn, openDetailsDefault) {
   const wrap = document.createElement("div");
-  wrap.className = "turn-block"; wrap.id = `turn-${turn.id}`;
+  wrap.className = "turn-block";
+  wrap.id = `turn-${turn.id}`;
+
   const modelEntries = Object.entries(turn.answers || {});
   let cardsHtml = "";
   modelEntries.forEach(([key, m]) => {
-    const badgeClass = m.status === "done" ? "done" : (m.status === "fail" ? "fail" : "loading");
-    const badgeText = m.status === "done" ? `${m.sec}s` : (m.status === "fail" ? "പരാജയം" : "ലോഡിംഗ്...");
-    const bodyHtml = m.status === "done" ? renderMarkdown(m.text) : (m.status === "fail" ? `<div style="color:var(--red);font-size:0.84rem;">${escapeHtml(m.error || "പരാജയപ്പെട്ടു")}</div>` : `<div class="skeleton">ഉത്തരം തയ്യാറാക്കുന്നു...</div>`);
-    cardsHtml += `<div class="ai-card"><div class="card-head"><div class="card-title">${escapeHtml(m.name)} <span class="badge ${badgeClass}" id="badge-${turn.id}-${key}">${badgeText}</span></div><button class="copy-btn" onclick="copyById('body-${turn.id}-${key}')">കോപ്പി</button></div><div class="ai-body" id="body-${turn.id}-${key}">${bodyHtml}</div></div>`;
+    const badgeClass = m.status === "done" ? "done" : (m.status === "fail" ? "fail" : (m.status === "skipped" ? "" : "loading"));
+    const badgeText = m.status === "done" ? `${m.sec}s` : (m.status === "fail" ? "പരാജയം" : (m.status === "skipped" ? "ഒഴിവാക്കി" : "..."));
+    const bodyHtml = m.status === "done"
+      ? renderMarkdown(m.text)
+      : (m.status === "fail"
+        ? `<div style="color:var(--red);font-size:14px;">${escapeHtml(m.error || "പരാജയപ്പെട്ടു")}</div>`
+        : (m.status === "skipped"
+          ? `<div style="color:var(--muted);font-size:13px;">Smart Mode — ആവശ്യമായില്ല</div>`
+          : THINKING_HTML));
+    cardsHtml += `
+      <div class="ai-card">
+        <div class="card-head">
+          <div class="card-title">${escapeHtml(m.name)} <span class="badge ${badgeClass}" id="badge-${turn.id}-${key}">${badgeText}</span></div>
+          <div class="msg-actions">
+            <button class="mini-round-btn" id="speak-${turn.id}-${key}" onclick="toggleSpeak('body-${turn.id}-${key}', 'speak-${turn.id}-${key}')" title="കേൾക്കുക" aria-label="കേൾക്കുക">${SPEAKER_ICON_SVG}</button>
+            <button class="mini-round-btn" onclick="copyById('body-${turn.id}-${key}')" title="കോപ്പി" aria-label="കോപ്പി">${COPY_ICON_SVG}</button>
+          </div>
+        </div>
+        <div class="ai-body" id="body-${turn.id}-${key}">${bodyHtml}</div>
+      </div>`;
   });
-  const finalStatusClass = turn.finalStatus === "done" ? "done" : (turn.finalStatus === "fail" ? "fail" : "loading");
-  const finalBodyHtml = turn.finalStatus === "done" ? renderMarkdown(turn.finalText) : (turn.finalStatus === "fail" ? `<div style="color:var(--red);">${escapeHtml(turn.finalError || "സംഗ്രഹം പരാജയപ്പെട്ടു")}</div>` : `<div class="skeleton">${escapeHtml(turn.finalStatusText || "ഉത്തരങ്ങൾക്കായി കാത്തിരിക്കുന്നു...")}</div>`);
-  wrap.innerHTML = `<div class="user-row"><div class="user-bubble">${escapeHtml(turn.question)}</div></div><div class="final-card"><div class="card-head"><div class="card-title">അന്തിമ ഉത്തരം <span class="badge ${finalStatusClass}" id="final-badge-${turn.id}">${escapeHtml(turn.finalBadge || "കാത്തിരിക്കുന്നു")}</span></div><button class="copy-btn" onclick="copyById('final-body-${turn.id}')">കോപ്പി</button></div><div class="ai-body" id="final-body-${turn.id}">${finalBodyHtml}</div></div><details class="models-details" id="details-${turn.id}" ${openDetailsDefault ? "open" : ""}><summary><span>${modelEntries.length} മോഡലുകളുടെ വെവ്വേറെ ഉത്തരങ്ങൾ</span><span>▼ കാണുക / മറയ്ക്കുക</span></summary><div class="grid">${cardsHtml}</div></details>`;
+
+  wrap.innerHTML = `
+    <div class="user-row"><div class="user-bubble">${escapeHtml(turn.question)}</div></div>
+    <div class="final-wrap" id="final-wrap-${turn.id}">
+      ${renderFinalInnerHtml(turn)}
+    </div>
+    <details class="models-details dev-only-block" id="details-${turn.id}" ${openDetailsDefault ? "open" : ""}>
+      <summary>
+        <span>${modelEntries.length} മോഡലുകളുടെ വിവരങ്ങൾ</span>
+        <span>▼ കാണുക</span>
+      </summary>
+      <div class="grid">${cardsHtml}</div>
+    </details>`;
   return wrap;
 }
 
-function updateContextHint(session) {
-  const count = session.turns.filter(t => t.finalStatus === "done" && t.finalText).length;
-  const used = Math.min(count, MAX_CONTEXT_TURNS);
-  document.getElementById("contextStatus").textContent = used === 0 ? "പുതിയ ചാറ്റ് • തുടർച്ചയായ സംഭാഷണം സജീവമാണ്" : `മെമ്മറി സജീവം • അവസാന ${used} ചോദ്യോത്തരങ്ങൾ ഓർത്തുവെച്ചിട്ടുണ്ട്`;
-  document.getElementById("turnCounter").textContent = used === 0 ? "" : `ആകെ: ${count}`;
-}
-
-async function callWorker(modelId, messages, timeoutMs = 65000) {
+/* API Worker Call */
+async function callWorker(modelId, messages, timeoutMs = 60000) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
@@ -386,179 +1895,359 @@ async function callWorker(modelId, messages, timeoutMs = 65000) {
       body: JSON.stringify({ model: modelId, messages }),
       signal: ctrl.signal
     });
-    const data = await res.json();
-    if (!res.ok) { if (res.status === 401) logout(); throw new Error(data.error || `Error ${res.status}`); }
-    return data.content;
+    const textRaw = await res.text();
+    let data = {};
+    try { data = JSON.parse(textRaw); } catch (e) { data = { error: textRaw || `HTTP ${res.status}` }; }
+
+    if (!res.ok) {
+      if (res.status === 401) logout();
+      const errMsg = typeof data.error === "string"
+        ? data.error
+        : (data.error && data.error.message ? data.error.message : `Error ${res.status}`);
+      throw new Error(errMsg);
+    }
+    const text = cleanMalayalamText(data.content || "");
+    if (!text) throw new Error("ശൂന്യമായ ഉത്തരം ലഭിച്ചു");
+    return text;
   } catch (err) {
     if (err.name === "AbortError") throw new Error("സമയം കഴിഞ്ഞു (Timeout)");
     throw err;
   } finally { clearTimeout(timer); }
 }
 
+const wait = (ms) => new Promise(r => setTimeout(r, ms));
+
 async function sendMessage() {
   if (state.isRunning) return;
+  stopSpeaking();
   const input = document.getElementById("promptInput");
   const question = input.value.trim();
   const activeModels = state.models.filter(m => m.enabled);
   if (!question) return;
   if (activeModels.length === 0) return showToast("കുറഞ്ഞത് ഒരു മോഡലെങ്കിലും തിരഞ്ഞെടുക്കുക");
 
-  state.isRunning = true; document.getElementById("sendBtn").disabled = true;
-  input.value = ""; input.style.height = "44px";
+  state.isRunning = true;
+  document.getElementById("sendBtn").disabled = true;
+  input.value = "";
+  input.style.height = "auto";
+  updateSendButtonState();
 
   const session = getCurrentSession();
-  if (session.turns.length === 0) session.title = question.slice(0, 50);
+  if (session.turns.length === 0) session.title = question.slice(0, 48);
 
   const recentTurns = session.turns.filter(t => t.finalStatus === "done" && t.finalText).slice(-MAX_CONTEXT_TURNS);
-  const contextMessages = [];
+  const baseMessages = [];
   recentTurns.forEach(t => {
-    contextMessages.push({ role: "user", content: t.question });
-    contextMessages.push({ role: "assistant", content: t.finalText });
+    baseMessages.push({ role: "user", content: t.question });
+    baseMessages.push({ role: "assistant", content: t.finalText });
   });
 
-  const mlOnly = document.getElementById("mlOnlyToggle").checked;
-  const baseMessages = [];
-  if (mlOnly) {
-    baseMessages.push({ role: "system", content: "Always reply strictly in clear, natural, conversational Malayalam (മലയാളം), even if the user writes in Manglish or English. Avoid awkward literal translations; use English only for essential technical terms." });
-  }
-  baseMessages.push(...contextMessages, { role: "user", content: question });
+  const userContent = state.mlOnly
+    ? `${question}\n\n[നിർദ്ദേശം: ശുദ്ധവും സ്വാഭാവികവുമായ മലയാളത്തിൽ മാത്രം മറുപടി നൽകുക. മലയാളം വാക്കുകൾക്കിടയിൽ ഇംഗ്ലീഷ് അക്ഷരങ്ങളോ മറ്റ് വിദേശ ഭാഷകളിലെ അക്ഷരങ്ങളോ കലർത്തരുത്. അക്ഷരത്തെറ്റും ചിഹ്നങ്ങളിലെ അകലവും പാടില്ല.]`
+    : question;
+  baseMessages.push({ role: "user", content: userContent });
+
+  // Order models so selected primary model is tried first
+  const orderedModels = [...activeModels].sort((a, b) => {
+    if (a.id === state.synthModelId) return -1;
+    if (b.id === state.synthModelId) return 1;
+    return 0;
+  });
 
   const turn = {
-    id: Date.now(), question, finalStatus: "loading",
-    finalBadge: "മോഡലുകൾക്കായി കാത്തിരിക്കുന്നു...",
-    finalStatusText: `തിരഞ്ഞെടുത്ത ${activeModels.length} മോഡലുകളുടെ ഉത്തരങ്ങൾ വന്നാലുടൻ സംഗ്രഹം തയ്യാറാകും...`,
-    finalText: "", answers: {}
+    id: Date.now(),
+    question,
+    finalStatus: "loading",
+    finalBadge: "",
+    finalText: "",
+    finalError: "",
+    finalRawError: "",
+    answers: {}
   };
-  activeModels.forEach(m => { turn.answers[m.key] = { name: m.name, id: m.id, status: "loading", text: "", sec: "" }; });
+  orderedModels.forEach(m => {
+    turn.answers[m.key] = {
+      name: m.name,
+      id: m.id,
+      status: state.multiMode ? "loading" : "skipped",
+      text: "",
+      sec: ""
+    };
+  });
   session.turns.push(turn);
 
   const thread = document.getElementById("chatThread");
-  const empty = thread.querySelector(".empty-state");
-  if (empty) empty.remove();
-  thread.appendChild(buildTurnElement(turn, true));
+  thread.classList.add("has-turns");
+  const welcome = thread.querySelector(".welcome-wrap");
+  if (welcome) welcome.remove();
+  document.getElementById("headerCenter").classList.add("visible");
+  document.getElementById("headerTitle").textContent = session.title.slice(0, 24);
+  thread.appendChild(buildTurnElement(turn, false));
   scrollToBottom();
 
-  const tasks = activeModels.map(async (m) => {
-    const start = Date.now();
-    const badgeEl = document.getElementById(`badge-${turn.id}-${m.key}`);
-    const bodyEl = document.getElementById(`body-${turn.id}-${m.key}`);
-    try {
-      const reply = await callWorker(m.id, baseMessages);
-      const sec = ((Date.now() - start) / 1000).toFixed(1);
-      turn.answers[m.key] = { ...turn.answers[m.key], status: "done", text: reply, sec };
-      if (badgeEl) { badgeEl.className = "badge done"; badgeEl.textContent = `${sec}s`; }
-      if (bodyEl) { bodyEl.innerHTML = renderMarkdown(reply); }
-    } catch (err) {
-      turn.answers[m.key] = { ...turn.answers[m.key], status: "fail", error: err.message };
-      if (badgeEl) { badgeEl.className = "badge fail"; badgeEl.textContent = "പരാജയം"; }
-      if (bodyEl) { bodyEl.innerHTML = `<div style="color:var(--red);font-size:0.84rem;">${escapeHtml(err.message)}</div>`; }
-    }
-  });
+  if (!state.multiMode) {
+    /* SMART AUTO-FALLBACK MODE: Saves 80%+ OpenRouter free quota */
+    let bestAnswer = null;
+    const errors = [];
 
-  await Promise.allSettled(tasks);
-
-  const successList = Object.values(turn.answers).filter(a => a.status === "done");
-  const finalBadgeEl = document.getElementById(`final-badge-${turn.id}`);
-  const finalBodyEl = document.getElementById(`final-body-${turn.id}`);
-
-  if (successList.length === 0) {
-    turn.finalStatus = "fail"; turn.finalBadge = "പരാജയപ്പെട്ടു";
-    turn.finalError = "ഒരു മോഡലിൽ നിന്നും ഉത്തരം ലഭിച്ചില്ല. Model ID-കളും OpenRouter ബാലൻസും പരിശോധിക്കുക.";
-    if (finalBadgeEl) { finalBadgeEl.className = "badge fail"; finalBadgeEl.textContent = turn.finalBadge; }
-    if (finalBodyEl) { finalBodyEl.innerHTML = `<div style="color:var(--red);">${escapeHtml(turn.finalError)}</div>`; }
-  } else if (successList.length === 1) {
-    turn.finalStatus = "done"; turn.finalBadge = `${successList[0].name} മാത്രം`; turn.finalText = successList[0].text;
-    if (finalBadgeEl) { finalBadgeEl.className = "badge done"; finalBadgeEl.textContent = turn.finalBadge; }
-    if (finalBodyEl) { finalBodyEl.innerHTML = renderMarkdown(turn.finalText); }
-  } else {
-    const synthId = document.getElementById("synthModelSelect").value;
-    if (finalBadgeEl) { finalBadgeEl.className = "badge loading"; finalBadgeEl.textContent = "സംഗ്രഹിക്കുന്നു..."; }
-    if (finalBodyEl) { finalBodyEl.innerHTML = `<div class="skeleton">${successList.length} ഉത്തരങ്ങൾ ഒത്തുനോക്കി അന്തിമ ഉത്തരം തയ്യാറാക്കുന്നു...</div>`; }
-    const combined = successList.map(a => `### ${a.name}:\n${a.text}`).join("\n\n---\n\n");
-    const pastContextText = recentTurns.length > 0 ? "Previous Conversation Context:\n" + recentTurns.slice(-3).map(t => `User: ${t.question}\nAssistant: ${t.finalText}`).join("\n\n") + "\n\n---\n\n" : "";
-    const langRule = mlOnly ? "Write the entire final answer strictly in clear, natural, conversational Malayalam (മലയാളം), even if the user wrote in Manglish or English. Avoid stiff literal translations." : "Write the final answer in the same language as the user's question.";
-    const synthPrompt = [
-      { role: "system", content: `You are an expert synthesis assistant in a multi-turn conversation. Compare the given AI responses to the user's latest question (keeping previous context in mind). Combine the most accurate, consensus points into one clear, helpful final answer. Briefly note any major disagreements or factual mistakes if present. ${langRule}` },
-      { role: "user", content: `${pastContextText}Latest User Question:\n${question}\n\nAI Responses:\n${combined}` }
-    ];
-    try {
+    for (const m of orderedModels) {
       const start = Date.now();
-      const synthReply = await callWorker(synthId, synthPrompt);
-      const sec = ((Date.now() - start) / 1000).toFixed(1);
-      turn.finalStatus = "done"; turn.finalBadge = `പൂർത്തിയായി (${sec}s)`; turn.finalText = synthReply;
-      if (finalBadgeEl) { finalBadgeEl.className = "badge done"; finalBadgeEl.textContent = turn.finalBadge; }
-      if (finalBodyEl) { finalBodyEl.innerHTML = renderMarkdown(synthReply); }
-    } catch (err) {
-      turn.finalStatus = "fail"; turn.finalBadge = "സംഗ്രഹം പരാജയം"; turn.finalError = "സംഗ്രഹം തയ്യാറാക്കാനായില്ല: " + err.message;
-      if (finalBadgeEl) { finalBadgeEl.className = "badge fail"; finalBadgeEl.textContent = turn.finalBadge; }
-      if (finalBodyEl) { finalBodyEl.innerHTML = `<div style="color:var(--red);">${escapeHtml(turn.finalError)}</div>`; }
+      const badgeEl = document.getElementById(`badge-${turn.id}-${m.key}`);
+      const bodyEl = document.getElementById(`body-${turn.id}-${m.key}`);
+      turn.answers[m.key].status = "loading";
+      if (badgeEl) { badgeEl.className = "badge loading"; badgeEl.textContent = "..."; }
+      if (bodyEl) { bodyEl.innerHTML = THINKING_HTML; }
+
+      try {
+        const reply = await callWorker(m.id, baseMessages);
+        const sec = ((Date.now() - start) / 1000).toFixed(1);
+        const glitches = state.mlOnly ? getMalayalamGlitchScore(reply) : 0;
+
+        turn.answers[m.key] = { ...turn.answers[m.key], status: "done", text: reply, sec };
+        if (badgeEl) { badgeEl.className = "badge done"; badgeEl.textContent = `${sec}s`; }
+        if (bodyEl) { bodyEl.innerHTML = renderMarkdown(reply); }
+
+        if (!bestAnswer || glitches < bestAnswer.glitches) {
+          bestAnswer = { text: reply, glitches, name: m.name, sec };
+        }
+        // Stop immediately on clean answer (1 API call total!)
+        if (glitches <= 3) break;
+      } catch (err) {
+        errors.push(`${m.name}: ${err.message}`);
+        turn.answers[m.key] = { ...turn.answers[m.key], status: "fail", error: err.message };
+        if (badgeEl) { badgeEl.className = "badge fail"; badgeEl.textContent = "പരാജയം"; }
+        if (bodyEl) { bodyEl.innerHTML = `<div style="color:var(--red);font-size:14px;">${escapeHtml(err.message)}</div>`; }
+
+        // If daily OpenRouter quota is exhausted, stop retrying other free models immediately
+        if (err.message.toLowerCase().includes("free-models-per-day")) break;
+      }
+    }
+
+    if (bestAnswer) {
+      turn.finalStatus = "done";
+      turn.finalBadge = `${bestAnswer.name} · ${bestAnswer.sec}s`;
+      turn.finalText = cleanMalayalamText(bestAnswer.text);
+    } else {
+      const diag = formatFriendlyError(errors);
+      turn.finalStatus = "fail";
+      turn.finalBadge = "പരാജയപ്പെട്ടു";
+      turn.finalError = diag.title;
+      turn.finalRawError = diag.raw;
+    }
+    updateTurnFinalUI(turn);
+  } else {
+    /* MULTI-AI SYNTHESIS MODE */
+    const errors = [];
+    const tasks = orderedModels.map(async (m, idx) => {
+      if (idx > 0) await wait(idx * 350);
+      const start = Date.now();
+      const badgeEl = document.getElementById(`badge-${turn.id}-${m.key}`);
+      const bodyEl = document.getElementById(`body-${turn.id}-${m.key}`);
+      try {
+        const reply = await callWorker(m.id, baseMessages);
+        const sec = ((Date.now() - start) / 1000).toFixed(1);
+        turn.answers[m.key] = { ...turn.answers[m.key], status: "done", text: reply, sec };
+        if (badgeEl) { badgeEl.className = "badge done"; badgeEl.textContent = `${sec}s`; }
+        if (bodyEl) { bodyEl.innerHTML = renderMarkdown(reply); }
+      } catch (err) {
+        errors.push(`${m.name}: ${err.message}`);
+        turn.answers[m.key] = { ...turn.answers[m.key], status: "fail", error: err.message };
+        if (badgeEl) { badgeEl.className = "badge fail"; badgeEl.textContent = "പരാജയം"; }
+        if (bodyEl) { bodyEl.innerHTML = `<div style="color:var(--red);font-size:14px;">${escapeHtml(err.message)}</div>`; }
+      }
+    });
+
+    await Promise.allSettled(tasks);
+    const successList = Object.values(turn.answers).filter(a => a.status === "done");
+
+    if (successList.length === 0) {
+      const diag = formatFriendlyError(errors);
+      turn.finalStatus = "fail";
+      turn.finalBadge = "പരാജയപ്പെട്ടു";
+      turn.finalError = diag.title;
+      turn.finalRawError = diag.raw;
+      updateTurnFinalUI(turn);
+    } else {
+      const gemmaModel = state.models.find(m => m.id.toLowerCase().includes("gemma") || m.id.toLowerCase().includes("gemini"));
+      const sortedByPurity = [...successList].sort((a, b) => getMalayalamGlitchScore(a.text) - getMalayalamGlitchScore(b.text));
+      const fallbackIds = [
+        state.synthModelId,
+        gemmaModel ? gemmaModel.id : "",
+        ...sortedByPurity.map(s => s.id)
+      ].filter((id, i, arr) => id && arr.indexOf(id) === i).slice(0, 2);
+
+      if (successList.length === 1) {
+        turn.finalStatus = "done";
+        turn.finalBadge = successList[0].name;
+        turn.finalText = cleanMalayalamText(successList[0].text);
+        updateTurnFinalUI(turn);
+      } else {
+        await wait(600);
+        const combined = successList.map(a => `### ${a.name}:\n${a.text}`).join("\n\n---\n\n");
+        const pastContextText = recentTurns.length > 0
+          ? "Previous Context:\n" + recentTurns.slice(-3).map(t => `User: ${t.question}\nAssistant: ${t.finalText}`).join("\n\n") + "\n\n---\n\n"
+          : "";
+        const langRule = state.mlOnly
+          ? STRICT_ML_RULES
+          : "Write the final answer clearly in the same language as the user's question.";
+
+        const synthPrompt = [{
+          role: "user",
+          content: `You are an expert Malayalam editor and synthesis assistant. Read the AI answers below for the user's question and combine the most accurate, practical information into ONE clear, well-structured final answer. Fix any spelling mistakes or garbled characters from the source answers.\n\n${langRule}\n\n${pastContextText}Question:\n${question}\n\nAI Responses:\n${combined}`
+        }];
+
+        let bestResult = null;
+        const startAll = Date.now();
+        for (const candidateId of fallbackIds) {
+          try {
+            const reply = await callWorker(candidateId, synthPrompt);
+            const cleaned = cleanMalayalamText(reply);
+            const glitches = state.mlOnly ? getMalayalamGlitchScore(cleaned) : 0;
+            if (!bestResult || glitches < bestResult.glitches) {
+              bestResult = { text: cleaned, glitches };
+            }
+            if (glitches <= 3) break;
+          } catch (err) {}
+        }
+
+        if (bestResult) {
+          const sec = ((Date.now() - startAll) / 1000).toFixed(1);
+          turn.finalStatus = "done";
+          turn.finalBadge = `${successList.length} AI · ${sec}s`;
+          turn.finalText = bestResult.text;
+        } else {
+          turn.finalStatus = "done";
+          turn.finalBadge = `${sortedByPurity[0].name}`;
+          turn.finalText = cleanMalayalamText(sortedByPurity[0].text);
+        }
+        updateTurnFinalUI(turn);
+      }
     }
   }
 
-  saveCurrentSession(session); updateContextHint(session); scrollToBottom();
-  state.isRunning = false; document.getElementById("sendBtn").disabled = false;
+  saveCurrentSession(session);
+  scrollToBottom();
+  state.isRunning = false;
+  document.getElementById("sendBtn").disabled = false;
+}
+
+/* Modals & Settings (Developer Only) */
+function openQuickSheet() {
+  if (!state.devMode) return;
+  document.getElementById("mlOnlyToggle").checked = state.mlOnly;
+  document.getElementById("multiModeToggle").checked = state.multiMode;
+  renderModelControls();
+  document.getElementById("quickSheet").style.display = "flex";
 }
 
 function openSettings() {
+  if (!state.devMode) return;
+  updateStaticAvatars();
+  document.getElementById("setUserName").value = state.userName;
+  document.getElementById("setDevPin").value = state.devPin;
   document.getElementById("setWorkerUrl").value = state.workerUrl;
   renderModelSettings(state.models);
   document.getElementById("settingsModal").style.display = "flex";
 }
+
 function renderModelSettings(list) {
   document.getElementById("modelSettingsInputs").innerHTML = list.map((m, i) => `
     <label class="field-label">${escapeHtml(m.name)} (Model ID)</label>
     <input type="text" class="input-field" id="set-model-${i}" value="${escapeHtml(m.id)}" data-name="${escapeHtml(m.name)}" data-key="${escapeHtml(m.key)}">
   `).join("");
 }
+
 function applyPreset(type) { renderModelSettings(cloneObj(PRESETS[type])); }
+
 function saveSettings() {
+  const newName = document.getElementById("setUserName").value.trim();
+  if (newName) { state.userName = newName; localStorage.setItem("mai_username", newName); }
+  const newDevPin = document.getElementById("setDevPin").value.trim();
+  if (newDevPin) { state.devPin = newDevPin; localStorage.setItem("mai_dev_pin", newDevPin); }
   const newUrl = document.getElementById("setWorkerUrl").value.trim().replace(/\/$/, "");
   if (newUrl) { state.workerUrl = newUrl; localStorage.setItem("mai_worker", newUrl); }
   state.models = state.models.map((m, i) => {
     const inp = document.getElementById(`set-model-${i}`);
     return { key: inp.dataset.key, name: inp.dataset.name, id: inp.value.trim(), enabled: m.enabled };
   });
-  localStorage.setItem("mai_models", JSON.stringify(state.models));
-  renderModelChips(); closeModal("settingsModal"); showToast("സെറ്റിംഗ്സ് സേവ് ചെയ്തു");
+  localStorage.setItem("mai_models_v3", JSON.stringify(state.models));
+  renderModelControls();
+  if (getCurrentSession().turns.length === 0) renderChatThread();
+  closeModal("settingsModal");
+  showToast("സെറ്റിംഗ്സ് സേവ് ചെയ്തു");
 }
 
-function openHistory() {
+function renderHistoryList() {
   const list = document.getElementById("historyList");
   list.innerHTML = state.sessions.length === 0
-    ? `<p style="color:var(--muted);text-align:center;padding:24px;">സേവ് ചെയ്ത ചാറ്റുകളൊന്നുമില്ല.</p>`
-    : state.sessions.map(s => `<div class="history-item ${s.id === state.currentSessionId ? "active-chat" : ""}"><div class="history-main" onclick="loadSession('${s.id}')"><div class="history-q">${escapeHtml(s.title)}</div><div class="history-meta">${escapeHtml(s.updatedAt)} • ${s.turns.length} ചോദ്യങ്ങൾ</div></div><button class="del-btn" onclick="deleteSession('${s.id}')">✕</button></div>`).join("");
-  document.getElementById("historyModal").style.display = "flex";
+    ? `<p style="color:var(--muted);text-align:center;padding:24px;font-size:14px;">സേവ് ചെയ്ത ചാറ്റുകളൊന്നുമില്ല.</p>`
+    : state.sessions.map(s => `
+      <div class="history-item ${!state.incognito && s.id === state.currentSessionId ? "active-chat" : ""}">
+        <div class="history-main" onclick="loadSession('${s.id}')">
+          <div class="history-q">${escapeHtml(s.title)}</div>
+          <div class="history-meta">${escapeHtml(s.updatedAt)} • ${s.turns.length} ചോദ്യങ്ങൾ</div>
+        </div>
+        <button class="del-btn" onclick="deleteSession('${s.id}')">✕</button>
+      </div>`).join("");
 }
+
 function loadSession(id) {
   if (state.isRunning) return showToast("ഇപ്പോഴത്തെ ഉത്തരം പൂർത്തിയാകട്ടെ...");
-  state.currentSessionId = id; renderChatThread(); closeModal("historyModal");
+  stopSpeaking();
+  state.incognito = false;
+  document.getElementById("ghostBtn").classList.remove("ghost-active");
+  document.getElementById("incognitoBadge").style.display = "none";
+  state.currentSessionId = id;
+  renderChatThread();
+  toggleDrawer(false);
 }
+
 function deleteSession(id) {
   state.sessions = state.sessions.filter(s => s.id !== id);
   localStorage.setItem("mai_sessions_v2", JSON.stringify(state.sessions));
   if (state.currentSessionId === id) {
-    if (state.sessions.length > 0) state.currentSessionId = state.sessions[0].id;
-    else createFreshSession();
+    stopSpeaking();
+    createFreshSession();
     renderChatThread();
   }
-  openHistory();
+  renderHistoryList();
 }
+
 function clearAllSessions() {
   if (!confirm("സേവ് ചെയ്ത എല്ലാ ചാറ്റുകളും മായ്ക്കണോ?")) return;
-  state.sessions = []; localStorage.removeItem("mai_sessions_v2");
-  createFreshSession(); renderChatThread(); openHistory();
+  stopSpeaking();
+  state.sessions = [];
+  localStorage.removeItem("mai_sessions_v2");
+  createFreshSession();
+  renderChatThread();
+  renderHistoryList();
 }
+
 function closeModal(id) { document.getElementById(id).style.display = "none"; }
 function scrollToBottom() { const t = document.getElementById("chatThread"); requestAnimationFrame(() => { t.scrollTop = t.scrollHeight; }); }
 function copyById(elId) { const el = document.getElementById(elId); if (el) navigator.clipboard.writeText(el.innerText).then(() => showToast("കോപ്പി ചെയ്തു!")); }
+
 let toastTimer;
-function showToast(msg) { const t = document.getElementById("toast"); t.textContent = msg; t.style.display = "block"; clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.style.display = "none"; }, 2000); }
-function escapeHtml(str) { return String(str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.style.display = "block";
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.style.display = "none"; }, 2200);
+}
+
+function escapeHtml(str) {
+  return String(str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
 function renderMarkdown(text) {
   if (!text) return "";
   const codeBlocks = [];
   let safe = escapeHtml(text);
-  safe = safe.replace(/```(\w*)\n?([\s\S]*?)```/g, (_, lang, code) => { const idx = codeBlocks.length; codeBlocks.push(`<pre><code>${code.trim()}</code></pre>`); return `@@CODEBLOCK_${idx}@@`; });
+  safe = safe.replace(/```(\w*)\n?([\s\S]*?)```/g, (_, lang, code) => {
+    const idx = codeBlocks.length;
+    codeBlocks.push(`<pre><code>${code.trim()}</code></pre>`);
+    return `@@CODEBLOCK_${idx}@@`;
+  });
   safe = safe.replace(/`([^`]+)`/g, "<code>$1</code>");
   safe = safe.replace(/^### (.*$)/gim, "<h4>$1</h4>");
   safe = safe.replace(/^## (.*$)/gim, "<h3>$1</h3>");
@@ -577,7 +2266,7 @@ function renderMarkdown(text) {
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js").catch((err) => console.warn("SW failed:", err));
+    navigator.serviceWorker.register("./sw.js").catch(() => {});
   });
 }
 </script>
