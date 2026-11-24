@@ -1,22 +1,34 @@
 <!DOCTYPE html>
-<html lang="ml">
+<html lang="ml" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
+<meta name="referrer" content="no-referrer">
 <title>Multi-AI Hub</title>
 <link rel="manifest" href="./manifest.json">
-<meta name="theme-color" content="#faf9f5">
+<meta name="theme-color" id="themeColorMeta" content="#faf9f5">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Multi-AI">
-<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
-<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="icon" type="image/jpeg" href="https://raw.githubusercontent.com/shamsushaz14-debug/multi-ai/main/avatar.jpg">
+<link rel="apple-touch-icon" href="https://raw.githubusercontent.com/shamsushaz14-debug/multi-ai/main/avatar.jpg">
+<link rel="dns-prefetch" href="https://multi-ai-proxy.shamsushaz14.workers.dev">
+<link rel="preconnect" href="https://multi-ai-proxy.shamsushaz14.workers.dev" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Inter:wght@400;500;600&family=Noto+Sans+Malayalam:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Inter:wght@400;500;600;700&family=Noto+Sans+Malayalam:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>
+  (function() {
+    var saved = localStorage.getItem("mai_theme") || "light";
+    document.documentElement.setAttribute("data-theme", saved);
+    var meta = document.getElementById("themeColorMeta");
+    if (meta) meta.setAttribute("content", saved === "dark" ? "#121414" : "#faf9f5");
+  })();
+</script>
 <style>
   :root {
+    color-scheme: light;
     --bg: #faf9f5;
     --surface: #ffffff;
     --pill: #f0eee8;
@@ -25,18 +37,60 @@
     --border-strong: #d5d1c6;
     --text: #1c1b18;
     --text-soft: #5c5952;
+    --greeting-sub: #47443e;
     --muted: #8a867e;
     --accent: #6baaae;
     --accent-dark: #58969a;
     --accent-light: #9ed2d5;
-    --accent-soft: rgba(107, 170, 174, 0.16);
+    --accent-glow: #42dde6;
+    --accent-soft: rgba(107, 170, 174, 0.14);
     --dark-btn: #141413;
+    --code-bg: #f3f1eb;
+    --inline-code-bg: #efede6;
+    --backdrop: rgba(28, 27, 24, 0.38);
+    --toast-bg: #1c1b18;
+    --toast-text: #ffffff;
     --green: #1f7a44;
+    --green-bg: rgba(31, 122, 68, 0.1);
     --red: #c93b3b;
+    --red-bg: rgba(201, 59, 59, 0.1);
     --gold: #9a6700;
+    --gold-bg: rgba(154, 103, 0, 0.1);
     --shadow-composer: 0 4px 20px rgba(28, 27, 24, 0.06), 0 1px 3px rgba(28, 27, 24, 0.04);
     --font-serif: "Newsreader", "Noto Sans Malayalam", Georgia, serif;
     --font-sans: "Inter", "Noto Sans Malayalam", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+
+  html[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #121414;
+    --surface: #1b1e1f;
+    --pill: #232728;
+    --pill-hover: #2d3234;
+    --border: #2b3032;
+    --border-strong: #3b4245;
+    --text: #f1f4f3;
+    --text-soft: #b8c2c1;
+    --greeting-sub: #cfd8d7;
+    --muted: #869190;
+    --accent: #6baaae;
+    --accent-dark: #559195;
+    --accent-light: #9ed2d5;
+    --accent-glow: #42dde6;
+    --accent-soft: rgba(107, 170, 174, 0.2);
+    --dark-btn: #2a2f30;
+    --code-bg: #171a1b;
+    --inline-code-bg: #252b2c;
+    --backdrop: rgba(0, 0, 0, 0.62);
+    --toast-bg: #252b2c;
+    --toast-text: #f1f4f3;
+    --green: #4ade80;
+    --green-bg: rgba(74, 222, 128, 0.14);
+    --red: #f87171;
+    --red-bg: rgba(248, 113, 113, 0.14);
+    --gold: #fbbf24;
+    --gold-bg: rgba(251, 191, 36, 0.14);
+    --shadow-composer: 0 6px 24px rgba(0, 0, 0, 0.45), 0 1px 3px rgba(0, 0, 0, 0.3);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -46,6 +100,7 @@
     background: var(--bg);
     color: var(--text);
     font-size: 16px;
+    transition: background-color 0.25s ease, color 0.25s ease;
   }
   body {
     font-family: var(--font-sans);
@@ -76,19 +131,19 @@
     object-position: center 15%;
     background: #ffffff;
     border: 1.5px solid var(--border-strong);
-    box-shadow: 0 2px 8px rgba(28, 27, 24, 0.09);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.14);
     flex-shrink: 0;
     display: block;
   }
   .avatar-circle.av-welcome {
-    width: 84px;
-    height: 84px;
+    width: 86px;
+    height: 86px;
     margin: 0 auto 16px;
     padding: 2px;
     border: 2.5px solid var(--accent);
-    box-shadow: 0 4px 16px rgba(107, 170, 174, 0.24);
+    box-shadow: 0 4px 16px rgba(107, 170, 174, 0.28);
   }
-  .avatar-circle.av-chat    { width: 28px; height: 28px; border-width: 1px; border-color: var(--accent); }
+  .avatar-circle.av-chat    { width: 30px; height: 30px; border-width: 1.5px; border-color: var(--accent); }
   .avatar-circle.av-drawer  { width: 32px; height: 32px; border-width: 1.5px; border-color: var(--accent); }
   .avatar-circle.av-preview { width: 54px; height: 54px; border-color: var(--accent); }
 
@@ -131,6 +186,182 @@
     font-weight: 600;
   }
 
+  /* Modern Top Header Bar */
+  header {
+    flex-shrink: 0;
+    height: 56px;
+    padding: 0 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background: var(--bg);
+    z-index: 20;
+    transition: background-color 0.25s ease;
+  }
+  .top-icon-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    touch-action: manipulation;
+    transition: background 0.18s ease, transform 0.14s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .top-icon-btn:active { background: var(--pill); transform: scale(0.92); }
+
+  /* Modern Animated Dark / Light Theme Toggle Button */
+  .theme-toggle-btn {
+    position: relative;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+  }
+  html[data-theme="dark"] .theme-toggle-btn {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+    border-color: var(--border-strong);
+  }
+  .theme-icon {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    pointer-events: none;
+    transition: transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
+  }
+  .theme-icon.icon-moon {
+    color: var(--accent-dark);
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+  .theme-icon.icon-sun {
+    color: #f6c453;
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.45);
+  }
+  html[data-theme="dark"] .theme-icon.icon-moon {
+    opacity: 0;
+    transform: rotate(90deg) scale(0.45);
+  }
+  html[data-theme="dark"] .theme-icon.icon-sun {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+    filter: drop-shadow(0 0 5px rgba(246, 196, 83, 0.45));
+  }
+
+  .header-center {
+    flex: 1;
+    min-width: 0;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .header-center.visible { opacity: 1; pointer-events: auto; }
+  .header-center span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Modern Tap-to-Speak Button (In Bottom Composer) */
+  .loudspeaker-btn {
+    position: relative;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: none;
+    background: var(--accent);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    touch-action: manipulation;
+    transition: background 0.18s ease, transform 0.12s ease, box-shadow 0.2s ease, opacity 0.18s ease;
+  }
+  .loudspeaker-btn * { pointer-events: none; }
+  .loudspeaker-btn.no-answer {
+    opacity: 0.55;
+  }
+  .loudspeaker-btn:active {
+    background: var(--accent-dark);
+    transform: scale(0.94);
+  }
+  .loudspeaker-btn.is-speaking {
+    opacity: 1;
+    background: linear-gradient(135deg, #4f9498 0%, #6baaae 55%, #7ec2c6 100%);
+    box-shadow: 0 3px 12px rgba(107, 170, 174, 0.48);
+  }
+  .loudspeaker-btn .sp-ring {
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    border: 2px solid rgba(107, 170, 174, 0.65);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .loudspeaker-btn.is-speaking .sp-ring {
+    animation: speakerSonar 1.5s cubic-bezier(0.2, 0.7, 0.3, 1) infinite;
+  }
+  .loudspeaker-btn .sp-svg {
+    width: 19px;
+    height: 19px;
+    display: block;
+  }
+  .loudspeaker-btn .icon-sp-eq { display: none; }
+  .loudspeaker-btn .icon-sp-on { display: block; }
+
+  .loudspeaker-btn.is-speaking .icon-sp-on { display: none; }
+  .loudspeaker-btn.is-speaking .icon-sp-eq { display: flex; }
+
+  /* Modern Equalizer Bars */
+  .eq-bars {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2.5px;
+    height: 15px;
+  }
+  .eq-bars i {
+    display: block;
+    width: 2.5px;
+    height: 6px;
+    border-radius: 99px;
+    background: currentColor;
+    animation: eqBounce 0.8s ease-in-out infinite;
+  }
+  .eq-bars i:nth-child(1) { animation-delay: 0s; }
+  .eq-bars i:nth-child(2) { animation-delay: 0.16s; }
+  .eq-bars i:nth-child(3) { animation-delay: 0.32s; }
+  .eq-bars i:nth-child(4) { animation-delay: 0.12s; }
+
+  @keyframes eqBounce {
+    0%, 100% { height: 4px; opacity: 0.75; }
+    50%      { height: 15px; opacity: 1; }
+  }
+  @keyframes speakerSonar {
+    0%   { transform: scale(0.95); opacity: 0.85; }
+    100% { transform: scale(1.45); opacity: 0; }
+  }
+
   /* Floating Small Round Speaker & Copy Buttons on Right Side of Screen */
   .side-float-actions {
     position: fixed;
@@ -156,9 +387,11 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 3px 10px rgba(28, 27, 24, 0.16);
+    touch-action: manipulation;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.22);
     transition: background 0.15s, transform 0.12s, box-shadow 0.15s;
   }
+  .side-round-btn * { pointer-events: none; }
   .side-round-btn:active {
     background: var(--accent-dark);
     transform: scale(0.92);
@@ -166,7 +399,6 @@
   .side-round-btn.speaking {
     background: var(--accent-dark);
     box-shadow: 0 0 0 4px rgba(107, 170, 174, 0.34);
-    animation: pulse 1.3s infinite;
   }
   .side-round-btn svg {
     width: 16px;
@@ -174,17 +406,17 @@
     display: block;
   }
 
-  /* Modern Thinking Motion (#6baaae Theme) */
+  /* Compact Radiant Glowing Chatbot Thinking Motion (#6baaae Luminous Theme) */
   .thinking-row {
     display: inline-flex;
     align-items: center;
-    gap: 11px;
-    padding: 8px 4px;
+    gap: 9px;
+    padding: 6px 4px;
   }
-  .thinking-sparkle-wrap {
+  .thinking-bot-wrap {
     position: relative;
-    width: 26px;
-    height: 26px;
+    width: 29px;
+    height: 29px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -192,105 +424,130 @@
   }
   .thinking-glow {
     position: absolute;
-    inset: -3px;
+    inset: -4px;
     border-radius: 50%;
-    background: conic-gradient(from 0deg, #6baaae, #9ed2d5, #4b8a8e, #82bfc3, #6baaae);
-    opacity: 0.34;
-    filter: blur(5px);
-    animation: aiGlowSpin 2.2s linear infinite;
+    background: radial-gradient(
+      circle,
+      rgba(66, 221, 230, 0.65) 0%,
+      rgba(107, 170, 174, 0.4) 45%,
+      rgba(158, 210, 213, 0.1) 70%,
+      transparent 82%
+    );
+    filter: blur(4px);
+    animation: botGlowPulse 1.6s ease-in-out infinite;
   }
-  .thinking-sparkle {
-    width: 22px;
-    height: 22px;
+  .thinking-ring {
+    position: absolute;
+    inset: 1px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(66, 221, 230, 0.65);
+    opacity: 0;
+    animation: botRingExpand 2.1s cubic-bezier(0.2, 0.7, 0.3, 1) infinite;
+  }
+  .thinking-bot-svg {
+    width: 25px;
+    height: 25px;
+    color: var(--accent);
     position: relative;
     z-index: 1;
-    animation: aiSparklePulse 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    transform-origin: center 75%;
+    animation: botFloatGlow 1.9s ease-in-out infinite;
+  }
+  .bot-eye {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: botBlink 2.8s ease-in-out infinite;
+  }
+  .bot-antenna-ball {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: botAntennaShine 1.2s ease-in-out infinite;
   }
   .thinking-label {
     font-family: var(--font-sans);
-    font-size: 16px;
-    font-weight: 500;
-    letter-spacing: 0.015em;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
     background: linear-gradient(
-      110deg,
-      #8b9697 0%,
-      #8b9697 30%,
-      #4b8a8e 44%,
-      #6baaae 52%,
-      #9ed2d5 60%,
-      #8b9697 74%,
-      #8b9697 100%
+      105deg,
+      #4b8a8e 0%,
+      #6baaae 26%,
+      #34d4de 42%,
+      #bdfcff 50%,
+      #34d4de 58%,
+      #6baaae 74%,
+      #4b8a8e 100%
     );
-    background-size: 260% 100%;
+    background-size: 250% 100%;
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    animation: aiTextSweep 2.1s linear infinite;
+    animation: aiTextShine 1.8s linear infinite, textGlowPulse 1.8s ease-in-out infinite;
   }
 
-  @keyframes aiGlowSpin {
-    0%   { transform: rotate(0deg) scale(0.92); opacity: 0.24; }
-    50%  { transform: rotate(180deg) scale(1.12); opacity: 0.44; }
-    100% { transform: rotate(360deg) scale(0.92); opacity: 0.24; }
+  @keyframes botGlowPulse {
+    0%, 100% { transform: scale(0.86); opacity: 0.55; }
+    50%      { transform: scale(1.22); opacity: 1; }
   }
-  @keyframes aiSparklePulse {
-    0%   { transform: rotate(0deg) scale(0.88); }
-    45%  { transform: rotate(180deg) scale(1.1); }
-    55%  { transform: rotate(180deg) scale(1.1); }
-    100% { transform: rotate(360deg) scale(0.88); }
+  @keyframes botRingExpand {
+    0%   { transform: scale(0.72); opacity: 0.75; }
+    100% { transform: scale(1.45); opacity: 0; }
   }
-  @keyframes aiTextSweep {
+  @keyframes botFloatGlow {
+    0%, 100% {
+      transform: translateY(0px) rotate(0deg);
+      filter: drop-shadow(0 0 3px rgba(107, 170, 174, 0.55));
+    }
+    25% {
+      transform: translateY(-2.2px) rotate(-4deg);
+      filter: drop-shadow(0 0 7px rgba(66, 221, 230, 0.88)) drop-shadow(0 0 12px rgba(107, 170, 174, 0.5));
+    }
+    50% {
+      transform: translateY(-0.8px) rotate(0deg);
+      filter: drop-shadow(0 0 5px rgba(66, 221, 230, 0.68));
+    }
+    75% {
+      transform: translateY(-2.2px) rotate(4deg);
+      filter: drop-shadow(0 0 7px rgba(66, 221, 230, 0.88)) drop-shadow(0 0 12px rgba(107, 170, 174, 0.5));
+    }
+  }
+  @keyframes botBlink {
+    0%, 42%, 52%, 100% { transform: scaleY(1); }
+    47%                { transform: scaleY(0.12); }
+  }
+  @keyframes botAntennaShine {
+    0%, 100% { transform: scale(0.92); fill: #6baaae; filter: drop-shadow(0 0 2px rgba(66, 221, 230, 0.5)); }
+    50%      { transform: scale(1.22); fill: #4ef0f8; filter: drop-shadow(0 0 6px rgba(78, 240, 248, 1)); }
+  }
+  @keyframes aiTextShine {
     0%   { background-position: 120% 0; }
-    100% { background-position: -140% 0; }
+    100% { background-position: -130% 0; }
+  }
+  @keyframes textGlowPulse {
+    0%, 100% { filter: drop-shadow(0 0 2px rgba(107, 170, 174, 0.32)); }
+    50%      { filter: drop-shadow(0 0 6px rgba(66, 221, 230, 0.68)); }
+  }
+  @keyframes msgFadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 
-  /* Top Navigation Bar */
-  header {
-    flex-shrink: 0;
-    height: 56px;
-    padding: 0 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: var(--bg);
-    z-index: 20;
+  /* Waving Hand Greeting Animation */
+  .wave-hand {
+    display: inline-block;
+    font-size: 1.12em;
+    transform-origin: 70% 75%;
+    animation: handWave 2.4s ease-in-out infinite;
   }
-  .top-icon-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: none;
-    background: transparent;
-    color: var(--text);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background 0.15s;
-  }
-  .top-icon-btn:active { background: var(--pill); }
-  .top-icon-btn.ghost-active {
-    background: var(--accent);
-    color: #fff;
-  }
-  .header-center {
-    font-size: 15px;
-    font-weight: 500;
-    color: var(--text-soft);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s;
-  }
-  .header-center.visible { opacity: 1; pointer-events: auto; }
-  .incognito-tag {
-    font-size: 12px;
-    background: var(--accent);
-    color: #fff;
-    padding: 2px 8px;
-    border-radius: 12px;
+  @keyframes handWave {
+    0%   { transform: rotate(0deg); }
+    10%  { transform: rotate(16deg); }
+    20%  { transform: rotate(-10deg); }
+    30%  { transform: rotate(16deg); }
+    40%  { transform: rotate(-6deg); }
+    50%  { transform: rotate(12deg); }
+    60%  { transform: rotate(0deg); }
+    100% { transform: rotate(0deg); }
   }
 
   /* Main Chat Area */
@@ -322,12 +579,25 @@
   }
   .greeting-title {
     font-family: var(--font-serif);
-    font-size: clamp(1.7rem, 6.4vw, 2.25rem);
-    font-weight: 400;
+    font-size: clamp(1.75rem, 6.6vw, 2.3rem);
+    font-weight: 500;
     letter-spacing: -0.02em;
     color: var(--text);
-    margin-bottom: 10px;
+    margin-bottom: 5px;
     line-height: 1.2;
+  }
+  .greeting-sub {
+    font-family: var(--font-serif);
+    font-size: clamp(1.22rem, 4.6vw, 1.5rem);
+    font-weight: 500;
+    color: var(--greeting-sub);
+    margin-bottom: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    line-height: 1.3;
+    letter-spacing: -0.005em;
   }
   .plan-pill {
     align-items: center;
@@ -345,8 +615,8 @@
   .plan-pill:active { background: var(--pill-hover); }
   .plan-pill strong { color: var(--text); font-weight: 600; }
 
-  /* Chat Turns — 16sp (16px) Reading Size */
-  .turn-block { margin-bottom: 26px; }
+  /* Chat Turns — Comfortable 18px Reading Size */
+  .turn-block { margin-bottom: 28px; }
   .user-row {
     display: flex;
     justify-content: flex-end;
@@ -355,16 +625,17 @@
   .user-bubble {
     background: var(--pill);
     color: var(--text);
-    padding: 11px 16px;
+    padding: 12px 17px;
     border-radius: 20px 20px 6px 20px;
     max-width: 88%;
-    font-size: 16px;
-    line-height: 1.6;
+    font-size: 18px;
+    line-height: 1.62;
     white-space: pre-wrap;
     word-wrap: break-word;
   }
 
   .final-wrap { padding: 2px 2px 6px; }
+  .final-wrap.fresh-reveal { animation: msgFadeIn 0.24s ease-out; }
   .final-head {
     display: flex;
     align-items: center;
@@ -379,6 +650,7 @@
     font-size: 15px;
     font-weight: 600;
     color: var(--text);
+    flex-wrap: wrap;
   }
   .msg-actions {
     display: flex;
@@ -393,13 +665,13 @@
     color: var(--text-soft);
     font-weight: 500;
   }
-  .badge.loading { color: var(--gold); background: rgba(154, 103, 0, 0.1); }
-  .badge.done { color: var(--green); background: rgba(31, 122, 68, 0.1); }
-  .badge.fail { color: var(--red); background: rgba(201, 59, 59, 0.1); }
+  .badge.loading { color: var(--gold); background: var(--gold-bg); }
+  .badge.done { color: var(--green); background: var(--green-bg); }
+  .badge.fail { color: var(--red); background: var(--red-bg); }
 
   .error-detail-note {
     margin-top: 6px;
-    font-size: 13px;
+    font-size: 14px;
     color: var(--muted);
     word-break: break-word;
   }
@@ -417,49 +689,55 @@
     justify-content: center;
     cursor: pointer;
     flex-shrink: 0;
+    touch-action: manipulation;
     transition: background 0.15s, transform 0.1s;
   }
+  .mini-round-btn * { pointer-events: none; }
   .mini-round-btn:active { background: var(--accent-dark); transform: scale(0.92); }
   .mini-round-btn.speaking {
     background: var(--accent-dark);
     box-shadow: 0 0 0 3px rgba(107, 170, 174, 0.32);
-    animation: pulse 1.3s infinite;
   }
   .mini-round-btn svg { width: 13px; height: 13px; display: block; }
 
   .ai-body {
-    font-size: 16px;
+    font-size: 18px;
     color: var(--text);
     word-wrap: break-word;
-    line-height: 1.75;
+    line-height: 1.78;
+  }
+  .ai-body hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 14px 0;
   }
   .ai-body pre {
-    background: #f3f1eb;
+    background: var(--code-bg);
     padding: 12px;
     border-radius: 12px;
     overflow-x: auto;
     margin: 10px 0;
     border: 1px solid var(--border);
-    font-size: 14px;
-    line-height: 1.5;
+    font-size: 15px;
+    line-height: 1.55;
   }
   .ai-body code {
-    background: #efede6;
+    background: var(--inline-code-bg);
     padding: 1px 5px;
     border-radius: 5px;
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 14px;
+    font-size: 15px;
   }
   .ai-body pre code { background: transparent; padding: 0; }
   .ai-body h3, .ai-body h4 {
     font-family: var(--font-sans);
-    margin: 12px 0 4px;
+    margin: 14px 0 6px;
     color: var(--text);
-    font-size: 18px;
+    font-size: 19px;
     font-weight: 700;
   }
-  .ai-body ul { padding-left: 20px; margin: 6px 0; }
-  .ai-body li { margin-bottom: 5px; }
+  .ai-body ul { padding-left: 22px; margin: 8px 0; }
+  .ai-body li { margin-bottom: 6px; }
 
   /* Collapsible Individual Models (Developer Mode Only) */
   .models-details {
@@ -491,7 +769,7 @@
     grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
     gap: 10px;
     padding: 10px;
-    background: #faf9f5;
+    background: var(--bg);
   }
   .ai-card {
     background: var(--surface);
@@ -515,10 +793,10 @@
     flex-wrap: wrap;
   }
   .ai-card .ai-body {
-    max-height: 280px;
+    max-height: 290px;
     overflow-y: auto;
-    font-size: 16px;
-    line-height: 1.68;
+    font-size: 17.5px;
+    line-height: 1.72;
   }
 
   /* Floating Bottom Composer — All Buttons #6baaae */
@@ -529,6 +807,7 @@
     margin: 0 auto;
     padding: 8px 14px calc(12px + env(safe-area-inset-bottom, 0px));
     background: var(--bg);
+    transition: background-color 0.25s ease;
   }
   .composer-box {
     background: var(--surface);
@@ -539,7 +818,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    transition: border-radius 0.18s ease, padding 0.18s ease, border-color 0.15s;
+    transition: border-radius 0.18s ease, padding 0.18s ease, border-color 0.15s, background-color 0.25s ease;
   }
   .composer-box.expanded {
     border-radius: 26px;
@@ -567,8 +846,8 @@
     background: transparent;
     color: var(--text);
     font-family: var(--font-sans);
-    font-size: 16px;
-    line-height: 1.45;
+    font-size: 17px;
+    line-height: 1.48;
     resize: none;
     max-height: 140px;
     min-height: 24px;
@@ -604,11 +883,10 @@
     justify-content: center;
     cursor: pointer;
     flex-shrink: 0;
+    touch-action: manipulation;
     transition: background 0.15s, transform 0.1s;
   }
   .circle-btn:active { background: var(--accent-dark); transform: scale(0.95); }
-  .circle-btn.recording { background: var(--red); color: #fff; animation: pulse 1.2s infinite; }
-  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.65; } }
 
   .model-pill-btn {
     height: 38px;
@@ -630,29 +908,83 @@
   }
   .model-pill-btn:active { background: var(--accent-dark); }
 
+  /* Modern Stop / Send Primary Action Button */
   .primary-circle-btn {
+    position: relative;
+    z-index: 5;
     width: 38px;
     height: 38px;
     border-radius: 50%;
     border: none;
-    background: var(--accent);
-    color: #ffffff;
+    background: rgba(107, 170, 174, 0.32);
+    color: rgba(255, 255, 255, 0.88);
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
+    cursor: default;
     flex-shrink: 0;
-    transition: background 0.15s, opacity 0.15s, transform 0.1s;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: background 0.2s ease, opacity 0.18s ease, transform 0.12s ease, color 0.18s ease, box-shadow 0.2s ease;
   }
-  .primary-circle-btn:active { background: var(--accent-dark); transform: scale(0.95); }
-  .primary-circle-btn.ready-send { background: var(--accent); }
-  .primary-circle-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .primary-circle-btn * { pointer-events: none; }
+  html[data-theme="dark"] .primary-circle-btn {
+    background: rgba(107, 170, 174, 0.24);
+    color: rgba(241, 244, 243, 0.52);
+  }
+  .primary-circle-btn.ready-send {
+    background: var(--accent);
+    color: #ffffff;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(107, 170, 174, 0.35);
+  }
+  .primary-circle-btn.ready-send:active {
+    background: var(--accent-dark);
+    transform: scale(0.93);
+  }
+  /* Active Modern Stop State while AI is generating */
+  .primary-circle-btn.is-stopping {
+    background: linear-gradient(135deg, #4b8d91 0%, #6baaae 60%, #7ec3c7 100%);
+    color: #ffffff;
+    cursor: pointer;
+    box-shadow: 0 3px 14px rgba(107, 170, 174, 0.48);
+  }
+  .primary-circle-btn.is-stopping:active {
+    transform: scale(0.91);
+    background: var(--accent-dark);
+  }
+  .stop-spin-ring {
+    position: absolute;
+    inset: -3.5px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    border-top-color: var(--accent-glow);
+    border-right-color: rgba(107, 170, 174, 0.65);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+  .primary-circle-btn.is-stopping .stop-spin-ring {
+    opacity: 1;
+    animation: stopRingSpin 1.05s linear infinite;
+  }
+  .primary-circle-btn.is-stopping #stopIcon {
+    animation: stopCorePulse 1.4s ease-in-out infinite;
+  }
+  @keyframes stopRingSpin {
+    to { transform: rotate(360deg); }
+  }
+  @keyframes stopCorePulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(0.86); }
+  }
 
   /* Slide-out Left Sidebar Drawer */
   .drawer-backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(28, 27, 24, 0.35);
+    background: var(--backdrop);
     z-index: 80;
     opacity: 0;
     pointer-events: none;
@@ -667,7 +999,7 @@
     border-right: 1px solid var(--border);
     z-index: 85;
     transform: translateX(-100%);
-    transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.25s ease;
     display: flex;
     flex-direction: column;
     padding: 16px;
@@ -767,7 +1099,7 @@
     position: fixed;
     inset: 0;
     z-index: 95;
-    background: rgba(28, 27, 24, 0.4);
+    background: var(--backdrop);
     display: none;
     align-items: flex-end;
     justify-content: center;
@@ -781,9 +1113,13 @@
     background: var(--bg);
     border-radius: 24px 24px 0 0;
     padding: 18px 18px calc(20px + env(safe-area-inset-bottom, 0px));
-    box-shadow: 0 -8px 30px rgba(0,0,0,0.12);
+    box-shadow: 0 -8px 30px rgba(0,0,0,0.22);
+    border-top: 1px solid var(--border);
   }
-  .modal-bg.center-modal .sheet { border-radius: 22px; }
+  .modal-bg.center-modal .sheet {
+    border-radius: 22px;
+    border: 1px solid var(--border);
+  }
   .sheet-head {
     display: flex;
     justify-content: space-between;
@@ -876,26 +1212,28 @@
     top: 64px;
     left: 50%;
     transform: translateX(-50%);
-    background: var(--dark-btn);
-    color: #fff;
+    background: var(--toast-bg);
+    color: var(--toast-text);
+    border: 1px solid var(--border);
     padding: 8px 16px;
     border-radius: 999px;
     font-size: 14px;
     display: none;
     z-index: 150;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.22);
+    white-space: nowrap;
   }
 </style>
 </head>
 <body>
 
-<!-- Shared SVG Gradient for #6baaae Sparkle -->
+<!-- Shared Glowing Gradient for Thinking Bot -->
 <svg width="0" height="0" style="position:absolute;">
   <defs>
-    <linearGradient id="tealSparkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#4b8a8e"/>
+    <linearGradient id="botGlowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3bc9d3"/>
       <stop offset="50%" stop-color="#6baaae"/>
-      <stop offset="100%" stop-color="#9ed2d5"/>
+      <stop offset="100%" stop-color="#7ef2f7"/>
     </linearGradient>
   </defs>
 </svg>
@@ -911,14 +1249,27 @@
 
   <div class="header-center" id="headerCenter">
     <span id="headerTitle">Multi-AI</span>
-    <span class="incognito-tag" id="incognitoBadge" style="display:none;">Private</span>
   </div>
 
-  <button class="top-icon-btn" id="ghostBtn" aria-label="Private Chat" title="പ്രൈവറ്റ് ചാറ്റ് (സേവ് ആകില്ല)" onclick="toggleIncognito()">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M12 3a7 7 0 0 0-7 7v9.2c0 .6.7.9 1.2.6l2.3-1.6a1 1 0 0 1 1.2 0l1.7 1.3a1 1 0 0 0 1.2 0l1.7-1.3a1 1 0 0 1 1.2 0l2.3 1.6c.5.3 1.2 0 1.2-.6V10a7 7 0 0 0-7-7Z"/>
-      <circle cx="9.5" cy="11" r="1" fill="currentColor" stroke="none"/>
-      <circle cx="14.5" cy="11" r="1" fill="currentColor" stroke="none"/>
+  <!-- Modern Animated Dark / Light Theme Toggle -->
+  <button class="top-icon-btn theme-toggle-btn" id="themeToggleBtn" type="button" aria-label="ഡാർക്ക് മോഡ്" title="ഡാർക്ക് / ലൈറ്റ് മോഡ്" onclick="toggleTheme()">
+    <svg class="theme-icon icon-moon" viewBox="0 0 24 24" fill="none">
+      <path d="M20.354 14.354A8.5 8.5 0 0 1 9.646 3.646a8.5 8.5 0 1 0 10.708 10.708Z" fill="currentColor" fill-opacity="0.16" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M18.5 3.5L19.1 5.3L20.9 5.9L19.1 6.5L18.5 8.3L17.9 6.5L16.1 5.9L17.9 5.3L18.5 3.5Z" fill="currentColor"/>
+      <circle cx="14.6" cy="9.2" r="1" fill="currentColor"/>
+    </svg>
+    <svg class="theme-icon icon-sun" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="4.2" fill="currentColor" fill-opacity="0.22" stroke="currentColor" stroke-width="1.9"/>
+      <g stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="12" y1="2.5" x2="12" y2="4.6"/>
+        <line x1="12" y1="19.4" x2="12" y2="21.5"/>
+        <line x1="2.5" y1="12" x2="4.6" y2="12"/>
+        <line x1="19.4" y1="12" x2="21.5" y2="12"/>
+        <line x1="5.28" y1="5.28" x2="6.77" y2="6.77"/>
+        <line x1="17.23" y1="17.23" x2="18.72" y2="18.72"/>
+        <line x1="18.72" y1="5.28" x2="17.23" y2="6.77"/>
+        <line x1="6.77" y1="17.23" x2="5.28" y2="18.72"/>
+      </g>
     </svg>
   </button>
 </header>
@@ -928,7 +1279,7 @@
 
 <!-- Floating Right-Side Round Speaker & Copy Buttons -->
 <div class="side-float-actions" id="sideFloatActions">
-  <button class="side-round-btn" id="floatSpeakBtn" type="button" onclick="speakVisibleAnswer()" title="കേൾക്കുക" aria-label="കേൾക്കുക">
+  <button class="side-round-btn" id="floatSpeakBtn" type="button" onclick="handleManualSpeak()" title="കേൾക്കുക" aria-label="കേൾക്കുക">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
       <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
       <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
@@ -947,7 +1298,7 @@
 <div class="composer-outer">
   <div class="composer-box" id="composerBox">
     <div class="composer-input-wrap">
-      <textarea id="promptInput" rows="1" placeholder="Type or hold to talk"></textarea>
+      <textarea id="promptInput" rows="1" placeholder="Chat with Multi-AI"></textarea>
     </div>
 
     <div class="composer-actions">
@@ -959,26 +1310,27 @@
           </svg>
         </button>
         <button class="model-pill-btn dev-only" type="button" id="modelPillBtn" onclick="openQuickSheet()">
-          <span id="modelPillLabel">Smart · Gemma 4 31B</span>
+          <span id="modelPillLabel">Auto · Smart Router</span>
         </button>
       </div>
 
       <div class="actions-right">
-        <button class="circle-btn" type="button" id="micBtn" title="വോയ്‌സ് ടൈപ്പിംഗ് (മലയാളം)" onclick="toggleVoice()">
-          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="9" y="3" width="6" height="11" rx="3"></rect>
-            <path d="M5 11a7 7 0 0 0 14 0"></path>
-            <line x1="12" y1="18" x2="12" y2="21"></line>
+        <!-- Modern Tap-to-Speak Button (Manual Play / Stop Only) -->
+        <button class="loudspeaker-btn no-answer" id="loudspeakerBtn" type="button" aria-label="സ്പീക്കർ" title="സ്പീക്കർ" onclick="handleManualSpeak()">
+          <span class="sp-ring"></span>
+          <svg class="sp-svg icon-sp-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 5L6 9H3a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h3l5 4V5z" fill="currentColor" fill-opacity="0.22"/>
+            <path d="M15.5 8.5a5 5 0 0 1 0 7"></path>
+            <path d="M18.8 5.4a9.3 9.3 0 0 1 0 13.2"></path>
           </svg>
+          <span class="eq-bars icon-sp-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
         </button>
 
-        <button class="primary-circle-btn" type="button" id="sendBtn" onclick="handlePrimaryAction()" aria-label="Send">
-          <svg id="waveIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
-            <line x1="5" y1="10" x2="5" y2="14"></line>
-            <line x1="9" y1="7" x2="9" y2="17"></line>
-            <line x1="13" y1="5" x2="13" y2="19"></line>
-            <line x1="17" y1="8" x2="17" y2="16"></line>
-            <line x1="21" y1="11" x2="21" y2="13"></line>
+        <!-- Modern Stop Button / Active Send Button -->
+        <button class="primary-circle-btn" type="button" id="sendBtn" aria-label="സ്റ്റോപ്പ്" title="സ്റ്റോപ്പ്">
+          <span class="stop-spin-ring" aria-hidden="true"></span>
+          <svg id="stopIcon" width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <rect x="6.5" y="6.5" width="11" height="11" rx="3" fill="currentColor"/>
           </svg>
           <svg id="arrowIcon" style="display:none;" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
             <line x1="12" y1="19" x2="12" y2="5"></line>
@@ -1046,24 +1398,40 @@
 
     <label class="toggle-row">
       <div>
-        <span>ശുദ്ധമായ മലയാളം മാത്രം</span>
-        <small>അക്ഷരത്തെറ്റും മറ്റ് ഭാഷകളും കലരാത്ത മലയാളം ഉത്തരം</small>
+        <span>സ്മാർട്ട് ഓട്ടോ-റൂട്ടിംഗ് (ചോദ്യത്തിനനുസരിച്ച് മോഡൽ)</span>
+        <small>കോഡിംഗ് → Particle-1, കണക്ക്/വിശകലനം → Nemotron 550B, മലയാളം → Gemma 4</small>
+      </div>
+      <input type="checkbox" id="autoRouteToggle" checked onchange="saveQuickPrefs()">
+    </label>
+
+    <label class="toggle-row">
+      <div>
+        <span>ശുദ്ധമായ മലയാളം മാത്രം (Zero-Glitch)</span>
+        <small>അക്ഷരങ്ങൾ മുറിയാതെയും വിദേശ അക്ഷരങ്ങൾ കലരാതെയും മറുപടി നൽകും</small>
       </div>
       <input type="checkbox" id="mlOnlyToggle" checked onchange="saveQuickPrefs()">
     </label>
 
     <label class="toggle-row">
       <div>
+        <span>ഓട്ടോ മലയാളം പ്രൂഫ്‌റീഡിംഗ് (Smart Gemma Polish)</span>
+        <small>യഥാർത്ഥ പിശക് കണ്ടാൽ മാത്രം Gemma 4 ശുദ്ധമലയാളത്തിലാക്കും</small>
+      </div>
+      <input type="checkbox" id="autoPolishToggle" checked onchange="saveQuickPrefs()">
+    </label>
+
+    <label class="toggle-row">
+      <div>
         <span>Multi-AI സംഗ്രഹ മോഡ് (കൂടുതൽ ക്വാട്ട വേണം)</span>
-        <small>ഓഫ് ആക്കിയാൽ Smart Fallback വഴി 1 റിക്വസ്റ്റിൽ വേഗത്തിൽ ഉത്തരം കിട്ടും</small>
+        <small>ഓഫ് ആക്കിയാൽ Smart Router വഴി വേഗത്തിൽ ഉത്തരം കിട്ടും</small>
       </div>
       <input type="checkbox" id="multiModeToggle" onchange="saveQuickPrefs()">
     </label>
 
-    <label class="field-label">പ്രധാന / സംഗ്രഹ മോഡൽ</label>
+    <label class="field-label">ഡിഫോൾട്ട് / സംഗ്രഹ മോഡൽ</label>
     <select id="synthModelSelect" class="select-field" onchange="saveQuickPrefs()"></select>
 
-    <label class="field-label">സജീവ മോഡലുകൾ (Fallback ലിസ്റ്റ്)</label>
+    <label class="field-label">സജീവ മോഡലുകൾ</label>
     <div id="quickModelsList"></div>
 
     <div style="display:flex; gap:8px; margin-top:10px;">
@@ -1085,7 +1453,7 @@
     <div class="avatar-upload-card">
       <div id="settingsAvatarPreview"></div>
       <div class="avatar-upload-actions">
-        <small>ഗാലറിയിൽ നിന്ന് അവതാർ ഫോട്ടോ തിരഞ്ഞെടുക്കുകയോ ഫോൾഡറിൽ avatar.jpg സേവ് ചെയ്യുകയോ ചെയ്യാം.</small>
+        <small>ഗാലറിയിൽ നിന്ന് അവതാർ ഫോട്ടോ തിരഞ്ഞെടുക്കുകയോ GitHub-ൽ avatar.jpg അപ്‌ലോഡ് ചെയ്യുകയോ ചെയ്യാം.</small>
         <div class="upload-btn-row">
           <label class="preset-btn" style="cursor:pointer;">
             ഫോട്ടോ തിരഞ്ഞെടുക്കുക
@@ -1095,9 +1463,6 @@
         </div>
       </div>
     </div>
-
-    <label class="field-label">നിങ്ങളുടെ പേര് (Greeting)</label>
-    <input type="text" id="setUserName" class="input-field" placeholder="Shamsu">
 
     <label class="field-label">Developer PIN (സെറ്റിംഗ്സ് തുറക്കാൻ)</label>
     <input type="password" id="setDevPin" class="input-field" placeholder="പുതിയ PIN നൽകുക">
@@ -1121,21 +1486,33 @@
 
 <script>
 const DEFAULT_WORKER_URL = "https://multi-ai-proxy.shamsushaz14.workers.dev";
-const DEFAULT_APP_PIN = ""; // മറ്റുള്ളവരുടെ ഫോണിലും ലോക്ക് ഇല്ലാതെ പ്രവർത്തിക്കാൻ Worker-ലെ APP_PIN ഇവിടെ നൽകുക
-const DEFAULT_AVATAR_PATH = "./avatar.jpg";
+const DEFAULT_APP_PIN = "";
+const GITHUB_RAW_AVATAR = "https://raw.githubusercontent.com/shamsushaz14-debug/multi-ai/main/avatar.jpg";
+const GITHUB_PAGES_AVATAR = "https://shamsushaz14-debug.github.io/multi-ai/avatar.jpg?v=14";
+const LOCAL_AVATAR_PATH = "./avatar.jpg?v=14";
 const DEFAULT_DEV_PIN = "1414";
 const BEST_ML_MODEL_ID = "google/gemma-4-31b-it:free";
-const MAX_CONTEXT_TURNS = 6;
+const MAX_CONTEXT_TURNS = 3;
 const MAX_SAVED_SESSIONS = 30;
+const MODEL_COOLDOWN_MS = 3 * 60 * 1000;
 
 const STARBURST_SVG = `<svg viewBox="0 0 64 64" fill="none"><path d="M32 6v20M32 38v20M6 32h20M38 32h20M13.6 13.6l14.2 14.2M36.2 36.2l14.2 14.2M50.4 13.6L36.2 27.8M27.8 36.2L13.6 50.4M22 8.2l7.5 18.2M34.5 37.6L42 55.8M8.2 42l18.2-7.5M37.6 29.5L55.8 22" stroke="currentColor" stroke-width="4.2" stroke-linecap="round"/></svg>`;
 
-const TEAL_SPARKLE_SVG = `<svg class="thinking-sparkle" viewBox="0 0 28 28" fill="none"><path d="M14 2C14.8 9.2 18.8 13.2 26 14C18.8 14.8 14.8 18.8 14 26C13.2 18.8 9.2 14.8 2 14C9.2 13.2 13.2 9.2 14 2Z" fill="url(#tealSparkGrad)"/></svg>`;
+const THINKING_BOT_SVG = `<svg class="thinking-bot-svg" viewBox="0 0 64 64" fill="none">
+  <circle class="bot-antenna-ball" cx="32" cy="8.5" r="6" fill="url(#botGlowGrad)"/>
+  <line x1="32" y1="14" x2="32" y2="20" stroke="url(#botGlowGrad)" stroke-width="4.2" stroke-linecap="round"/>
+  <rect x="2.5" y="27" width="7.5" height="16" rx="3.8" fill="url(#botGlowGrad)"/>
+  <rect x="54" y="27" width="7.5" height="16" rx="3.8" fill="url(#botGlowGrad)"/>
+  <path d="M18 20H46A8 8 0 0 1 54 28V42A8 8 0 0 1 46 50H28L16 60L18 50A8 8 0 0 1 10 42V28A8 8 0 0 1 18 20Z" stroke="url(#botGlowGrad)" stroke-width="4.2" stroke-linejoin="round" stroke-linecap="round" fill="var(--bg)"/>
+  <circle class="bot-eye" cx="22.5" cy="34" r="4.2" fill="url(#botGlowGrad)"/>
+  <circle class="bot-eye" cx="41.5" cy="34" r="4.2" fill="url(#botGlowGrad)"/>
+  <path d="M25.5 41.8Q32 46.8 38.5 41.8" stroke="url(#botGlowGrad)" stroke-width="3.2" stroke-linecap="round" fill="none"/>
+</svg>`;
 
-const THINKING_HTML = `<div class="thinking-row"><div class="thinking-sparkle-wrap"><span class="thinking-glow"></span>${TEAL_SPARKLE_SVG}</div><span class="thinking-label">Thinking</span></div>`;
+const THINKING_HTML = `<div class="thinking-row"><div class="thinking-bot-wrap"><span class="thinking-glow"></span><span class="thinking-ring"></span>${THINKING_BOT_SVG}</div><span class="thinking-label">Thinking</span></div>`;
 
 const SPEAKER_ICON_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>`;
-const STOP_ICON_SVG = `<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"></rect></svg>`;
+const EQ_BARS_HTML = `<span class="eq-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>`;
 const COPY_ICON_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
 
 const PRESETS = {
@@ -1158,7 +1535,7 @@ const PRESETS = {
 function cloneObj(o) { return JSON.parse(JSON.stringify(o)); }
 
 let state = {
-  userName: localStorage.getItem("mai_username") || "Shamsu",
+  theme: localStorage.getItem("mai_theme") || "light",
   customAvatar: localStorage.getItem("mai_avatar") || "",
   devPin: localStorage.getItem("mai_dev_pin") || DEFAULT_DEV_PIN,
   devMode: false,
@@ -1166,57 +1543,147 @@ let state = {
   pin: localStorage.getItem("mai_pin") || DEFAULT_APP_PIN,
   models: JSON.parse(localStorage.getItem("mai_models_v3") || "null") || cloneObj(PRESETS.free),
   synthModelId: localStorage.getItem("mai_synth_id_v2") || BEST_ML_MODEL_ID,
+  autoRoute: localStorage.getItem("mai_auto_route") !== "false",
+  autoPolish: localStorage.getItem("mai_auto_polish") !== "false",
   mlOnly: localStorage.getItem("mai_ml_only") !== "false",
   multiMode: localStorage.getItem("mai_multi_mode") === "true",
   sessions: JSON.parse(localStorage.getItem("mai_sessions_v2") || "[]"),
   currentSessionId: null,
-  incognito: false,
   isRunning: false
 };
 
-let recognition = null;
-let isListening = false;
+const modelCooldownUntil = new Map();
+const activeFetchControllers = new Set();
 let secretTapCount = 0;
 let secretTapTimer = null;
+let chatRunAbortController = null;
+let currentRunToken = 0;
+let lastStopTapMs = 0;
 
-/* Text-to-Speech (Working Speaker Engine for Malayalam & English) */
-let ttsVoices = [];
-let ttsActiveBtnId = null;
-let ttsSessionToken = 0;
-
-function loadTtsVoices() {
-  if (!("speechSynthesis" in window)) return;
-  ttsVoices = window.speechSynthesis.getVoices() || [];
+function markModelFailed(modelId) {
+  modelCooldownUntil.set(modelId, Date.now() + MODEL_COOLDOWN_MS);
 }
-if ("speechSynthesis" in window) {
-  loadTtsVoices();
-  window.speechSynthesis.onvoiceschanged = loadTtsVoices;
+function markModelHealthy(modelId) {
+  modelCooldownUntil.delete(modelId);
+}
+function isModelCoolingDown(modelId) {
+  const until = modelCooldownUntil.get(modelId);
+  if (!until) return false;
+  if (Date.now() > until) {
+    modelCooldownUntil.delete(modelId);
+    return false;
+  }
+  return true;
+}
+
+/* ============================================================
+   DARK / LIGHT MODE THEME CONTROLLER
+   ============================================================ */
+function applyTheme(themeName) {
+  const mode = themeName === "dark" ? "dark" : "light";
+  state.theme = mode;
+  document.documentElement.setAttribute("data-theme", mode);
+  localStorage.setItem("mai_theme", mode);
+
+  const meta = document.getElementById("themeColorMeta");
+  if (meta) meta.setAttribute("content", mode === "dark" ? "#121414" : "#faf9f5");
+
+  const btn = document.getElementById("themeToggleBtn");
+  if (btn) {
+    const label = mode === "dark" ? "ലൈറ്റ് മോഡിലേക്ക് മാറ്റുക" : "ഡാർക്ക് മോഡിലേക്ക് മാറ്റുക";
+    btn.setAttribute("aria-label", label);
+    btn.setAttribute("title", label);
+  }
+}
+
+function toggleTheme() {
+  applyTheme(state.theme === "dark" ? "light" : "dark");
+}
+
+/* ============================================================
+   DUAL-ENGINE MANUAL SPEAKER (Native TTS + Automatic Audio Fallback)
+   ============================================================ */
+const ttsAudio = new Audio();
+ttsAudio.preload = "auto";
+
+let ttsIsSpeaking = false;
+let ttsActiveCardBtnId = null;
+let ttsSessionToken = 0;
+let ttsWatchdogTimer = null;
+let ttsKeepAliveTimer = null;
+let speechSynthWedged = false;
+let currentUtterance = null;
+
+function syncSpeakerButtonsUI() {
+  const session = getCurrentSession();
+  const hasDone = session.turns.some(t => t.finalStatus === "done" && t.finalText);
+
+  const bottomBtn = document.getElementById("loudspeakerBtn");
+  if (bottomBtn) {
+    bottomBtn.classList.toggle("no-answer", !hasDone);
+    bottomBtn.classList.toggle("is-speaking", ttsIsSpeaking && !ttsActiveCardBtnId);
+  }
+
+  const floatBtn = document.getElementById("floatSpeakBtn");
+  if (floatBtn) {
+    const isMainSpeaking = ttsIsSpeaking && !ttsActiveCardBtnId;
+    floatBtn.classList.toggle("speaking", isMainSpeaking);
+    floatBtn.innerHTML = isMainSpeaking ? EQ_BARS_HTML : SPEAKER_ICON_SVG;
+  }
 }
 
 function stopSpeaking() {
   ttsSessionToken++;
+  if (ttsWatchdogTimer) {
+    clearTimeout(ttsWatchdogTimer);
+    ttsWatchdogTimer = null;
+  }
+  if (ttsKeepAliveTimer) {
+    clearInterval(ttsKeepAliveTimer);
+    ttsKeepAliveTimer = null;
+  }
+  currentUtterance = null;
+
+  try {
+    ttsAudio.onended = null;
+    ttsAudio.onerror = null;
+    ttsAudio.pause();
+    ttsAudio.currentTime = 0;
+  } catch (e) {}
+
   if ("speechSynthesis" in window) {
-    try { window.speechSynthesis.cancel(); } catch (e) {}
+    try {
+      if (window.speechSynthesis.speaking || window.speechSynthesis.pending || ttsIsSpeaking) {
+        window.speechSynthesis.cancel();
+      }
+    } catch (e) {}
   }
-  if (ttsActiveBtnId) {
-    const btn = document.getElementById(ttsActiveBtnId);
-    if (btn) {
-      btn.classList.remove("speaking");
-      btn.innerHTML = SPEAKER_ICON_SVG;
+
+  if (ttsActiveCardBtnId) {
+    const cardBtn = document.getElementById(ttsActiveCardBtnId);
+    if (cardBtn) {
+      cardBtn.classList.remove("speaking");
+      cardBtn.innerHTML = SPEAKER_ICON_SVG;
     }
-    ttsActiveBtnId = null;
+    ttsActiveCardBtnId = null;
   }
+
+  ttsIsSpeaking = false;
+  syncSpeakerButtonsUI();
 }
 
 function cleanTextForSpeech(raw) {
   return String(raw || "")
+    .replace(/```[\s\S]*?```/g, " ")
     .replace(/https?:\/\/\S+/g, "")
     .replace(/[`*_#~>|]/g, " ")
+    .replace(/[\u{1F300}-\u{1FAFF}\u2600-\u27BF]/gu, " ")
+    .replace(/\((?:Conclusion|Extra Tips)\)/gi, "")
     .replace(/\s+/g, " ")
     .trim();
 }
 
-function splitSpeechChunks(text, maxLen = 190) {
+function splitSpeechChunks(text, maxLen = 115) {
   const sentences = text.split(/(?<=[.!?।\n])\s+/);
   const chunks = [];
   for (const s of sentences) {
@@ -1241,74 +1708,210 @@ function splitSpeechChunks(text, maxLen = 190) {
   return chunks;
 }
 
-function pickBestVoice(isMalayalam) {
-  if (!ttsVoices.length) loadTtsVoices();
-  if (isMalayalam) {
-    return (
-      ttsVoices.find(v => v.lang && v.lang.toLowerCase() === "ml-in") ||
-      ttsVoices.find(v => v.lang && v.lang.toLowerCase().startsWith("ml")) ||
-      null
-    );
-  }
-  return (
-    ttsVoices.find(v => v.lang && v.lang.toLowerCase() === "en-in") ||
-    ttsVoices.find(v => v.lang && v.lang.toLowerCase().startsWith("en")) ||
-    null
-  );
-}
-
-function toggleSpeak(bodyElId, btnId) {
-  if (!("speechSynthesis" in window)) {
-    return showToast("ഈ ബ്രൗസറിൽ സ്പീക്കർ സൗകര്യം ലഭ്യമല്ല");
-  }
-
-  if (ttsActiveBtnId === btnId) {
-    stopSpeaking();
-    return;
-  }
-
-  const bodyEl = document.getElementById(bodyElId);
-  if (!bodyEl) return;
-  const text = cleanTextForSpeech(bodyEl.innerText);
-  if (!text) return showToast("വായിക്കാൻ ഉള്ളടക്കം ഒന്നുമില്ല");
-
-  stopSpeaking();
-  const myToken = ++ttsSessionToken;
-  ttsActiveBtnId = btnId;
-
-  const btn = document.getElementById(btnId);
-  if (btn) {
-    btn.classList.add("speaking");
-    btn.innerHTML = STOP_ICON_SVG;
-  }
-
-  const isMalayalam = /[\u0D00-\u0D7F]/.test(text);
-  const voice = pickBestVoice(isMalayalam);
-  const chunks = splitSpeechChunks(text, 190);
+function playHtmlAudioChunks(chunks, isMalayalam, myToken) {
+  const lang = isMalayalam ? "ml" : "en";
+  const clients = ["tw-ob", "gtx"];
   let idx = 0;
+  let clientIdx = 0;
 
-  const speakNext = () => {
+  const playNext = () => {
     if (myToken !== ttsSessionToken) return;
     if (idx >= chunks.length) {
       stopSpeaking();
       return;
     }
-    const utt = new SpeechSynthesisUtterance(chunks[idx++]);
-    utt.lang = isMalayalam ? "ml-IN" : "en-IN";
-    if (voice) utt.voice = voice;
-    utt.rate = 0.98;
-    utt.pitch = 1.0;
 
-    utt.onend = () => {
-      if (myToken === ttsSessionToken) speakNext();
+    const q = encodeURIComponent(chunks[idx]);
+    ttsAudio.src = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${lang}&client=${clients[clientIdx]}&q=${q}`;
+
+    ttsAudio.onended = () => {
+      if (myToken !== ttsSessionToken) return;
+      idx++;
+      playNext();
     };
-    utt.onerror = () => {
-      if (myToken === ttsSessionToken) stopSpeaking();
+
+    ttsAudio.onerror = () => {
+      if (myToken !== ttsSessionToken) return;
+      if (clientIdx + 1 < clients.length) {
+        clientIdx++;
+        playNext();
+      } else {
+        stopSpeaking();
+      }
     };
-    window.speechSynthesis.speak(utt);
+
+    try {
+      const playPromise = ttsAudio.play();
+      if (playPromise && typeof playPromise.catch === "function") {
+        playPromise.catch(() => {
+          if (myToken !== ttsSessionToken) return;
+          if (clientIdx + 1 < clients.length) {
+            clientIdx++;
+            playNext();
+          } else {
+            stopSpeaking();
+          }
+        });
+      }
+    } catch (e) {
+      stopSpeaking();
+    }
   };
 
-  setTimeout(speakNext, 60);
+  playNext();
+}
+
+function speakRawText(rawText, cardBtnId = null) {
+  const text = cleanTextForSpeech(rawText);
+  if (!text) return;
+
+  if (ttsIsSpeaking) {
+    stopSpeaking();
+  }
+
+  const myToken = ++ttsSessionToken;
+  ttsIsSpeaking = true;
+  ttsActiveCardBtnId = cardBtnId;
+
+  if (cardBtnId) {
+    const cardBtn = document.getElementById(cardBtnId);
+    if (cardBtn) {
+      cardBtn.classList.add("speaking");
+      cardBtn.innerHTML = EQ_BARS_HTML;
+    }
+  }
+  syncSpeakerButtonsUI();
+
+  const isMalayalam = /[\u0D00-\u0D7F]/.test(text);
+  const chunks = splitSpeechChunks(text, 115);
+
+  if (!("speechSynthesis" in window) || speechSynthWedged) {
+    playHtmlAudioChunks(chunks, isMalayalam, myToken);
+    return;
+  }
+
+  let idx = 0;
+  let hasStarted = false;
+  let switchedToFallback = false;
+
+  const triggerAudioFallback = () => {
+    if (switchedToFallback || myToken !== ttsSessionToken) return;
+    switchedToFallback = true;
+    speechSynthWedged = true;
+    if (ttsWatchdogTimer) {
+      clearTimeout(ttsWatchdogTimer);
+      ttsWatchdogTimer = null;
+    }
+    if (ttsKeepAliveTimer) {
+      clearInterval(ttsKeepAliveTimer);
+      ttsKeepAliveTimer = null;
+    }
+    currentUtterance = null;
+    try { window.speechSynthesis.cancel(); } catch (e) {}
+    playHtmlAudioChunks(chunks.slice(idx), isMalayalam, myToken);
+  };
+
+  ttsKeepAliveTimer = setInterval(() => {
+    if (myToken !== ttsSessionToken || switchedToFallback) {
+      clearInterval(ttsKeepAliveTimer);
+      ttsKeepAliveTimer = null;
+      return;
+    }
+    try {
+      if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+    } catch (e) {}
+  }, 4500);
+
+  const speakNext = () => {
+    if (myToken !== ttsSessionToken || switchedToFallback) return;
+    if (idx >= chunks.length) {
+      stopSpeaking();
+      return;
+    }
+
+    const utt = new SpeechSynthesisUtterance(chunks[idx]);
+    utt.lang = isMalayalam ? "ml-IN" : "en-IN";
+    utt.rate = 1.0;
+    utt.pitch = 1.0;
+    utt.volume = 1.0;
+
+    currentUtterance = utt;
+
+    if (!hasStarted) {
+      if (ttsWatchdogTimer) clearTimeout(ttsWatchdogTimer);
+      ttsWatchdogTimer = setTimeout(() => {
+        if (myToken === ttsSessionToken && !hasStarted && !switchedToFallback) {
+          triggerAudioFallback();
+        }
+      }, 1500);
+    }
+
+    utt.onstart = () => {
+      if (myToken !== ttsSessionToken) return;
+      hasStarted = true;
+      if (ttsWatchdogTimer) {
+        clearTimeout(ttsWatchdogTimer);
+        ttsWatchdogTimer = null;
+      }
+    };
+
+    utt.onend = () => {
+      if (myToken !== ttsSessionToken || switchedToFallback) return;
+      if (ttsWatchdogTimer) {
+        clearTimeout(ttsWatchdogTimer);
+        ttsWatchdogTimer = null;
+      }
+      idx++;
+      speakNext();
+    };
+
+    utt.onerror = (ev) => {
+      if (myToken !== ttsSessionToken || switchedToFallback) return;
+      const errType = ev && ev.error ? ev.error : "";
+      if (errType === "canceled" || errType === "interrupted") return;
+      if (!hasStarted) {
+        triggerAudioFallback();
+      } else {
+        stopSpeaking();
+      }
+    };
+
+    try {
+      if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+      window.speechSynthesis.speak(utt);
+    } catch (e) {
+      triggerAudioFallback();
+    }
+  };
+
+  speakNext();
+}
+
+function handleManualSpeak() {
+  if (ttsIsSpeaking) {
+    stopSpeaking();
+    return;
+  }
+  const turn = getVisibleCompletedTurn();
+  let textToRead = turn && turn.finalText ? turn.finalText : "";
+  if (!textToRead) {
+    const bodies = document.querySelectorAll("#chatThread .final-wrap .ai-body");
+    if (bodies.length > 0) textToRead = bodies[bodies.length - 1].innerText || "";
+  }
+  if (!textToRead.trim()) return;
+  speakRawText(textToRead, null);
+}
+
+function toggleSpeak(bodyElId, btnId) {
+  if (ttsIsSpeaking && ttsActiveCardBtnId === btnId) {
+    stopSpeaking();
+    return;
+  }
+  const bodyEl = document.getElementById(bodyElId);
+  if (!bodyEl) return;
+  const text = cleanTextForSpeech(bodyEl.innerText);
+  if (!text) return;
+  speakRawText(text, btnId);
 }
 
 /* Right-Side Floating Buttons Helpers */
@@ -1347,25 +1950,313 @@ function updateSideFloatActions() {
   const session = getCurrentSession();
   const hasDone = session.turns.some(t => t.finalStatus === "done" && t.finalText);
   box.classList.toggle("visible", hasDone);
-}
-
-function speakVisibleAnswer() {
-  if (ttsActiveBtnId === "floatSpeakBtn") {
-    stopSpeaking();
-    return;
-  }
-  const turn = getVisibleCompletedTurn();
-  if (!turn) return showToast("വായിക്കാൻ ഉത്തരമൊന്നുമില്ല");
-  toggleSpeak(`final-body-${turn.id}`, "floatSpeakBtn");
+  syncSpeakerButtonsUI();
 }
 
 function copyVisibleAnswer() {
   const turn = getVisibleCompletedTurn();
-  if (!turn) return showToast("കോപ്പി ചെയ്യാൻ ഉത്തരമൊന്നുമില്ല");
+  if (!turn) return;
   copyById(`final-body-${turn.id}`);
 }
 
 window.addEventListener("beforeunload", stopSpeaking);
+
+/* ============================================================
+   RELIABLE AVATAR LOADER (Works on localhost:8158 & GitHub Pages)
+   ============================================================ */
+function getAvatarFallbackList() {
+  const isLocal =
+    location.protocol === "file:" ||
+    location.hostname === "localhost" ||
+    location.hostname === "127.0.0.1";
+
+  const list = isLocal
+    ? [GITHUB_RAW_AVATAR, GITHUB_PAGES_AVATAR, LOCAL_AVATAR_PATH]
+    : [LOCAL_AVATAR_PATH, GITHUB_RAW_AVATAR, GITHUB_PAGES_AVATAR];
+
+  if (state.customAvatar) list.unshift(state.customAvatar);
+  return list;
+}
+
+function handleAvatarError(imgEl) {
+  const list = getAvatarFallbackList();
+  const nextStep = Number(imgEl.dataset.step || "0") + 1;
+  if (nextStep < list.length) {
+    imgEl.dataset.step = String(nextStep);
+    imgEl.src = list[nextStep];
+    return;
+  }
+  imgEl.onerror = null;
+  imgEl.style.display = "none";
+  if (imgEl.nextElementSibling) {
+    imgEl.nextElementSibling.style.display = "inline-flex";
+  }
+}
+
+function getAvatarHtml(sizeClass) {
+  const list = getAvatarFallbackList();
+  return `<img src="${list[0]}" alt="Avatar" class="avatar-circle ${sizeClass}" data-step="0" onerror="handleAvatarError(this)"><span class="avatar-fallback ${sizeClass}" style="display:none;">${STARBURST_SVG}</span>`;
+}
+
+function updateStaticAvatars() {
+  const drawerSlot = document.getElementById("drawerAvatarSlot");
+  const previewSlot = document.getElementById("settingsAvatarPreview");
+  if (drawerSlot) drawerSlot.innerHTML = getAvatarHtml("av-drawer");
+  if (previewSlot) previewSlot.innerHTML = getAvatarHtml("av-preview");
+}
+
+function handleAvatarUpload(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      const size = 256;
+      const canvas = document.createElement("canvas");
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, size, size);
+      const minSide = Math.min(img.width, img.height);
+      const sx = (img.width - minSide) / 2;
+      const sy = Math.max(0, (img.height - minSide) * 0.15);
+      ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, size, size);
+      const dataUrl = canvas.toDataURL("image/jpeg", 0.88);
+      state.customAvatar = dataUrl;
+      localStorage.setItem("mai_avatar", dataUrl);
+      updateStaticAvatars();
+      if (!state.isRunning) renderChatThread();
+      showToast("അവതാർ ഫോട്ടോ സേവ് ചെയ്തു!");
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+  event.target.value = "";
+}
+
+function resetAvatar() {
+  state.customAvatar = "";
+  localStorage.removeItem("mai_avatar");
+  updateStaticAvatars();
+  if (!state.isRunning) renderChatThread();
+  showToast("ഡിഫോൾട്ട് avatar.jpg-ലേക്ക് മാറ്റി");
+}
+
+/* ============================================================
+   FAST SMART TASK-BASED MODEL ROUTER
+   ============================================================ */
+function detectQuestionCategory(question) {
+  const q = String(question || "").toLowerCase();
+
+  const codingPattern = /(html|css|javascript|\bjs\b|python|java\b|php|sql|react|node|json|api\b|regex|code|coding|script|bug|debug|error|github|cloudflare|worker|pwa|manifest|function|variable|loop|array|website|app\s*code|കോഡ്|കോഡിംഗ്|പ്രോഗ്രാം|സ്ക്രിപ്റ്റ്|വെബ്സൈറ്റ്|ബഗ്|എറർ|എച്ച്ടിഎംഎൽ|സിഎസ്എസ്|ജാവാസ്ക്രിപ്റ്റ്|പൈത്തൺ)/i;
+  if (codingPattern.test(q) || /```|<\/?[a-z]+>|\bfunction\s*\(/i.test(q)) {
+    return {
+      type: "coding",
+      label: "കോഡിംഗ്",
+      timeoutMs: 42000,
+      maxTokens: 1500,
+      priority: ["particle", "claude", "deepseek", "gemma", "gpt-4", "gemini", "nemotron-3-ultra", "nemotron-3.5", "ernie"]
+    };
+  }
+
+  const reasoningPattern = /(math|calculat|equation|solve|formula|percent|profit|loss|interest|\bemi\b|budget|compare|difference|analyz|strategy|business\s*plan|logic|puzzle|proof|physics|chemistry|economics|algorithm|architecture|കണക്ക്|ഗണിതം|കണക്കുകൂട്ട|ശതമാനം|പലിശ|ലാഭം|നഷ്ടം|ബജറ്റ്|ചെലവ്|താരതമ്യം|വ്യത്യാസം|വിശകലനം|ബിസിനസ്|തന്ത്രം|ലോജിക്|ശാസ്ത്രം|വിലയിരുത്ത)/i;
+  const hasMathExpr = /\d+\s*[\+\-\*\/×÷=%]\s*\d+/.test(q);
+  if (reasoningPattern.test(q) || hasMathExpr) {
+    return {
+      type: "reasoning",
+      label: "വിശകലനം",
+      timeoutMs: 36000,
+      maxTokens: 900,
+      priority: ["gemma", "nemotron-3-ultra", "deepseek", "claude", "gemini", "gpt-4", "grok", "particle", "nemotron-3.5", "ernie"]
+    };
+  }
+
+  return {
+    type: "general",
+    label: "മലയാളം AI",
+    timeoutMs: 25000,
+    maxTokens: 650,
+    priority: ["gemma", "gemini", "claude", "gpt-4", "nemotron-3.5", "particle", "nemotron-3-ultra", "deepseek", "grok", "ernie"]
+  };
+}
+
+function getModelPriorityRank(model, priorityList) {
+  const hay = `${model.id} ${model.name}`.toLowerCase();
+  for (let i = 0; i < priorityList.length; i++) {
+    if (hay.includes(priorityList[i])) return i;
+  }
+  return 999;
+}
+
+function getOrderedModelsForQuestion(activeModels, question) {
+  let routeInfo;
+  let baseOrdered;
+
+  if (!state.autoRoute) {
+    routeInfo = { type: "manual", label: "Manual", timeoutMs: 28000, maxTokens: 700 };
+    baseOrdered = [...activeModels].sort((a, b) => {
+      if (a.id === state.synthModelId) return -1;
+      if (b.id === state.synthModelId) return 1;
+      return 0;
+    });
+  } else {
+    routeInfo = detectQuestionCategory(question);
+    baseOrdered = [...activeModels].sort((a, b) => {
+      return getModelPriorityRank(a, routeInfo.priority) - getModelPriorityRank(b, routeInfo.priority);
+    });
+  }
+
+  const healthy = baseOrdered.filter(m => !isModelCoolingDown(m.id));
+  const cooling = baseOrdered.filter(m => isModelCoolingDown(m.id));
+  return { routeInfo, orderedModels: [...healthy, ...cooling] };
+}
+
+function getBestMalayalamPolisherModel() {
+  const enabled = state.models.filter(m => m.enabled);
+  const pool = enabled.length ? enabled : state.models;
+  return (
+    pool.find(m => m.id.toLowerCase().includes("gemma") && !isModelCoolingDown(m.id)) ||
+    pool.find(m => m.id.toLowerCase().includes("gemini") && !isModelCoolingDown(m.id)) ||
+    pool.find(m => m.id.toLowerCase().includes("claude") && !isModelCoolingDown(m.id)) ||
+    pool.find(m => m.id.toLowerCase().includes("gemma")) ||
+    null
+  );
+}
+
+/* ============================================================
+   UNICODE-SAFE MALAYALAM ENGINE (ZERO BROKEN LETTERS)
+   ============================================================ */
+const FOREIGN_SCRIPT_REGEX = /[\uAC00-\uD7AF\u1100-\u11FF\u3130-\u318F\u4E00-\u9FFF\u3400-\u4DBF\u3000-\u30FF\uFF00-\uFFEF\u0400-\u04FF\u0600-\u06FF\u0900-\u097F\u0B80-\u0BFF\u0C00-\u0C7F\u0C80-\u0CFF\u0E00-\u0E7F\u00C0-\u024F\u1E00-\u1EFF]/g;
+const SELF_CORRECTION_REGEX = /\b(sorry[,.]?\s*(let me|i will|let's)|let me (write|redo|rephrase|try|fix|start)[^.\n]*|redo this cleanly|write properly)\b/i;
+
+function protectCodeBlocks(text) {
+  const blocks = [];
+  const safe = String(text || "").replace(/```[\s\S]*?```/g, (m) => {
+    const idx = blocks.length;
+    blocks.push(m);
+    return `@@CB_${idx}@@`;
+  });
+  return { safe, blocks };
+}
+
+function restoreCodeBlocks(text, blocks) {
+  let out = text;
+  blocks.forEach((b, i) => { out = out.replace(`@@CB_${i}@@`, b); });
+  return out;
+}
+
+function stripCodeForTextCheck(text) {
+  return String(text || "")
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/`[^`]+`/g, " ")
+    .replace(/https?:\/\/\S+/g, " ");
+}
+
+function cleanMalayalamText(text) {
+  if (!text) return "";
+  const { safe, blocks } = protectCodeBlocks(text);
+  let cleaned = safe;
+  try { cleaned = cleaned.normalize("NFC"); } catch (e) {}
+  cleaned = cleaned
+    .replace(/([\u0D15-\u0D39])\s+([\u0D3E-\u0D4D\u0D57])/g, "$1$2")
+    .replace(/([\u0D05-\u0D4C\u0D57])\s+([\u0D02\u0D03])/g, "$1$2")
+    .replace(/[\u25CC\uFFFD\u200B]/g, "")
+    .trim();
+  return restoreCodeBlocks(cleaned, blocks);
+}
+
+function getMalayalamGlitchScore(text) {
+  if (!text) return 999;
+  const plain = stripCodeForTextCheck(text);
+  let score = 0;
+
+  const foreign = plain.match(FOREIGN_SCRIPT_REGEX);
+  if (foreign) score += foreign.length * 10;
+
+  const trappedLatin = plain.match(/[\u0D00-\u0D7F][A-Za-z]+[\u0D00-\u0D7F]/g);
+  if (trappedLatin) score += trappedLatin.length * 10;
+
+  const gluedLower = plain.match(/[\u0D00-\u0D7F][a-z]{2,}|[a-z]{2,}[\u0D00-\u0D7F]/g);
+  if (gluedLower) score += gluedLower.length * 6;
+
+  const orphanedMarks = plain.match(/(?:^|[\s([{"'.,;!?])[\u0D3E-\u0D4D\u0D57\u0D02\u0D03]/g);
+  if (orphanedMarks) score += orphanedMarks.length * 6;
+
+  const badChars = plain.match(/[\u25CC\uFFFD]/g);
+  if (badChars) score += badChars.length * 8;
+
+  if (SELF_CORRECTION_REGEX.test(plain)) score += 40;
+
+  return score;
+}
+
+function isMostlyEnglishInsteadOfMalayalam(text) {
+  const plain = stripCodeForTextCheck(text);
+  const mlChars = (plain.match(/[\u0D00-\u0D7F]/g) || []).length;
+  const enChars = (plain.match(/[A-Za-z]/g) || []).length;
+  return plain.trim().length > 45 && mlChars < enChars * 0.55;
+}
+
+function safeSanitizeMalayalam(text) {
+  if (!text) return "";
+  const { safe, blocks } = protectCodeBlocks(text);
+  let out = safe;
+
+  if (SELF_CORRECTION_REGEX.test(out)) {
+    const parts = out.split(/\n\s*---+\s*\n|\n{2,}/);
+    let lastBadIdx = -1;
+    parts.forEach((p, idx) => {
+      if (SELF_CORRECTION_REGEX.test(p) || getMalayalamGlitchScore(p) >= 20) {
+        lastBadIdx = idx;
+      }
+    });
+    if (lastBadIdx >= 0 && lastBadIdx < parts.length - 1) {
+      const tail = parts.slice(lastBadIdx + 1).join("\n\n").trim();
+      if (tail.length >= 20) out = tail;
+    }
+  }
+
+  out = out.replace(/[^.\n]*(?:sorry[,.]?\s*(?:let me|i will|let's)|let me (?:write|redo|rephrase|try|fix)[^.\n]*|redo this cleanly|write properly)[^.\n]*\.?/gi, "");
+  out = out.replace(FOREIGN_SCRIPT_REGEX, "");
+  out = out
+    .replace(/([\u0D15-\u0D39])\s+([\u0D3E-\u0D4D\u0D57])/g, "$1$2")
+    .replace(/([\u0D05-\u0D4C\u0D57])\s+([\u0D02\u0D03])/g, "$1$2")
+    .replace(/[\u25CC\uFFFD\u200B]/g, "")
+    .replace(/[ \t]{2,}/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+
+  try { out = out.normalize("NFC"); } catch (e) {}
+  return restoreCodeBlocks(out, blocks);
+}
+
+function isSimpleGreeting(q) {
+  return /^(hi|hello|hey|hai|ok|okay|thanks|thank you|ഹായ്|ഹലോ|നമസ്കാരം|നന്ദി|ശരി)[!.,?\s]*$/i.test(String(q || "").trim());
+}
+
+const STRICT_ML_RULES = `ശുദ്ധവും കൃത്യവുമായ മലയാളത്തിൽ മാത്രം മറുപടി നൽകുക (അക്ഷരത്തെറ്റോ അന്യഭാഷാ അക്ഷരങ്ങളോ പാടില്ല).`;
+
+function buildPromptSuffix(question, routeInfo) {
+  const simple = isSimpleGreeting(question);
+  if (simple) {
+    return state.mlOnly
+      ? `${question}\n\n[1-2 വരിയിൽ ശുദ്ധമായ മലയാളത്തിൽ ഹൃദ്യമായി മറുപടി നൽകുക.]`
+      : `${question}\n\n[Reply warmly in 1-2 short sentences.]`;
+  }
+
+  if (routeInfo.type === "coding") {
+    return state.mlOnly
+      ? `${question}\n\n[കൃത്യമായ കോഡ് \`\`\` ബ്ലോക്കിൽ നൽകുക. വിശദീകരണം മിതമായും വ്യക്തമായും ശുദ്ധമായ മലയാളത്തിൽ മാത്രം. അവസാനം 1 വരിയിൽ **ചുരുക്കം:**, 1-2 ചെറിയ പോയിന്റിൽ **ടിപ്പുകൾ:** ചേർക്കുക.]`
+      : `${question}\n\n[Provide clean code in \`\`\` blocks with concise explanation. End briefly with **Conclusion:** (1 line) and **Extra Tips:** (1-2 bullets).]`;
+  }
+
+  if (state.mlOnly) {
+    return `${question}\n\n[${STRICT_ML_RULES} ഉത്തരം നീട്ടിപ്പരത്താതെ മിതമായ നീളത്തിൽ (3-5 ചെറിയ പോയിന്റുകൾ അല്ലെങ്കിൽ 4-5 വരികൾ) കൃത്യമായും വ്യക്തമായും നൽകുക. അവസാനം 1 വരിയിൽ **ചുരുക്കം:**, 1-2 ചെറിയ പോയിന്റിൽ **ടിപ്പുകൾ:** ചേർക്കുക.]`;
+  }
+  return `${question}\n\n[Answer concisely and accurately in moderate length (no fluff). End briefly with **Conclusion:** (1 line) and **Extra Tips:** (1-2 short bullets).]`;
+}
 
 /* Smart Error Diagnosis */
 function formatFriendlyError(errors) {
@@ -1449,106 +2340,11 @@ function handlePlusClick() {
   else startNewChat();
 }
 
-/* Malayalam Script Cleanup & Corruption Detector */
-function cleanMalayalamText(text) {
-  if (!text) return "";
-  return text
-    .replace(/([\u0D05-\u0D39])\s+([\u0D3E-\u0D4D\u0D57\u0D02\u0D03])/g, "$1$2")
-    .replace(/\u25CC/g, "")
-    .trim();
-}
-
-function getMalayalamGlitchScore(text) {
-  if (!text) return 999;
-  let score = 0;
-  const foreign = text.match(/[\uAC00-\uD7AF\u1100-\u11FF\u4E00-\u9FFF\u3040-\u30FF\u0400-\u04FF\u0900-\u097F\u0600-\u06FF]/g);
-  if (foreign) score += foreign.length * 6;
-  const mixed = text.match(/[\u0D00-\u0D7F][A-Za-z]+|[A-Za-z]+[\u0D00-\u0D7F]/g);
-  if (mixed) score += mixed.length * 4;
-  const brokenMarks = text.match(/(?:^|[\s([{"'])[\u0D3E-\u0D4D\u0D57]/g);
-  if (brokenMarks) score += brokenMarks.length * 3;
-  return score;
-}
-
-const STRICT_ML_RULES = `STRICT MALAYALAM SCRIPT RULES:
-1. Write ONLY in pure, natural, grammatically correct Malayalam Unicode script (ശുദ്ധമായ മലയാളം).
-2. NEVER mix English/Latin letters inside Malayalam words (for example, NEVER write things like "പൂRNമായും" or "കുതirthൽ").
-3. NEVER use any Korean, Chinese, Japanese, Hindi, or other foreign characters.
-4. NEVER put spaces before Malayalam vowel signs or chandrakkala (avoid broken characters like "ന ിർത്തുക" or "മ ിശ്രിച്ചോ").
-5. Avoid unnecessary English words in brackets; use natural Malayalam words everywhere unless a technical term has no Malayalam equivalent.`;
-
-/* Avatar Rendering with Auto-Fallback (.jpg -> .png -> icon-192.png -> SVG) */
-function getAvatarSrc() {
-  return state.customAvatar || DEFAULT_AVATAR_PATH;
-}
-
-function handleAvatarError(imgEl) {
-  const step = Number(imgEl.dataset.step || "0");
-  const fallbacks = ["./avatar.png", "./icon-192.png"];
-  if (!state.customAvatar && step < fallbacks.length) {
-    imgEl.dataset.step = String(step + 1);
-    imgEl.src = fallbacks[step];
-    return;
-  }
-  imgEl.onerror = null;
-  imgEl.style.display = "none";
-  if (imgEl.nextElementSibling) {
-    imgEl.nextElementSibling.style.display = "inline-flex";
-  }
-}
-
-function getAvatarHtml(sizeClass) {
-  return `<img src="${getAvatarSrc()}" alt="Shamsu Avatar" class="avatar-circle ${sizeClass}" data-step="0" onerror="handleAvatarError(this)"><span class="avatar-fallback ${sizeClass}" style="display:none;">${STARBURST_SVG}</span>`;
-}
-
-function updateStaticAvatars() {
-  const drawerSlot = document.getElementById("drawerAvatarSlot");
-  const previewSlot = document.getElementById("settingsAvatarPreview");
-  if (drawerSlot) drawerSlot.innerHTML = getAvatarHtml("av-drawer");
-  if (previewSlot) previewSlot.innerHTML = getAvatarHtml("av-preview");
-}
-
-function handleAvatarUpload(event) {
-  const file = event.target.files && event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const img = new Image();
-    img.onload = () => {
-      const size = 256;
-      const canvas = document.createElement("canvas");
-      canvas.width = size;
-      canvas.height = size;
-      const ctx = canvas.getContext("2d");
-      ctx.fillStyle = "#ffffff";
-      ctx.fillRect(0, 0, size, size);
-      const minSide = Math.min(img.width, img.height);
-      const sx = (img.width - minSide) / 2;
-      const sy = Math.max(0, (img.height - minSide) * 0.15);
-      ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, size, size);
-      const dataUrl = canvas.toDataURL("image/jpeg", 0.88);
-      state.customAvatar = dataUrl;
-      localStorage.setItem("mai_avatar", dataUrl);
-      updateStaticAvatars();
-      if (!state.isRunning) renderChatThread();
-      showToast("അവതാർ ഫോട്ടോ സേവ് ചെയ്തു!");
-    };
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
-  event.target.value = "";
-}
-
-function resetAvatar() {
-  state.customAvatar = "";
-  localStorage.removeItem("mai_avatar");
-  updateStaticAvatars();
-  if (!state.isRunning) renderChatThread();
-  showToast("ഡിഫോൾട്ട് avatar.jpg-ലേക്ക് മാറ്റി");
-}
-
 window.addEventListener("DOMContentLoaded", () => {
+  applyTheme(state.theme);
+  document.getElementById("autoRouteToggle").checked = state.autoRoute;
   document.getElementById("mlOnlyToggle").checked = state.mlOnly;
+  document.getElementById("autoPolishToggle").checked = state.autoPolish;
   document.getElementById("multiModeToggle").checked = state.multiMode;
   updateStaticAvatars();
   renderModelControls();
@@ -1560,24 +2356,28 @@ window.addEventListener("DOMContentLoaded", () => {
 
 function getGreetingText() {
   const hr = new Date().getHours();
-  let part = "Good evening";
-  if (hr >= 4 && hr < 12) part = "Good morning";
-  else if (hr >= 12 && hr < 17) part = "Good afternoon";
-  return `${part}, ${state.userName}`;
+  if (hr >= 4 && hr < 12) return "Good morning";
+  if (hr >= 12 && hr < 17) return "Good afternoon";
+  return "Good evening";
+}
+
+function hasActiveThinkingUI() {
+  const session = getCurrentSession();
+  if (session && session.turns.some(t => t.finalStatus === "loading")) return true;
+  return Boolean(document.querySelector("#chatThread .thinking-row"));
 }
 
 function setupComposerBehavior() {
   const box = document.getElementById("composerBox");
   const ta = document.getElementById("promptInput");
+  const sendBtn = document.getElementById("sendBtn");
 
   const expand = () => {
     box.classList.add("expanded");
-    ta.placeholder = "Chat with Multi-AI";
   };
   const maybeCollapse = () => {
     if (!ta.value.trim()) {
       box.classList.remove("expanded");
-      ta.placeholder = "Type or hold to talk";
       ta.style.height = "auto";
     }
   };
@@ -1599,67 +2399,126 @@ function setupComposerBehavior() {
   ta.addEventListener("keydown", (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
       e.preventDefault();
-      sendMessage();
+      if (!state.isRunning) sendMessage();
     }
+  });
+
+  // Instant Stop on first touch/pointer press — immune to Android keyboard resize swallowing clicks
+  const instantStopHandler = (e) => {
+    if (state.isRunning || hasActiveThinkingUI()) {
+      e.preventDefault();
+      e.stopPropagation();
+      lastStopTapMs = Date.now();
+      stopGeneration();
+    }
+  };
+  sendBtn.addEventListener("pointerdown", instantStopHandler, { passive: false });
+  sendBtn.addEventListener("touchstart", instantStopHandler, { passive: false });
+  sendBtn.addEventListener("click", (e) => {
+    if (Date.now() - lastStopTapMs < 450) {
+      e.preventDefault();
+      return;
+    }
+    handlePrimaryAction();
   });
 
   updateSendButtonState();
 }
 
 function updateSendButtonState() {
-  const hasText = document.getElementById("promptInput").value.trim().length > 0;
   const btn = document.getElementById("sendBtn");
-  document.getElementById("waveIcon").style.display = hasText ? "none" : "block";
-  document.getElementById("arrowIcon").style.display = hasText ? "block" : "none";
-  btn.classList.toggle("ready-send", hasText);
+  const stopIcon = document.getElementById("stopIcon");
+  const arrowIcon = document.getElementById("arrowIcon");
+  const hasText = document.getElementById("promptInput").value.trim().length > 0;
+  const activeRun = state.isRunning || hasActiveThinkingUI();
+
+  btn.disabled = false;
+  if (activeRun) {
+    stopIcon.style.display = "block";
+    arrowIcon.style.display = "none";
+    btn.classList.remove("ready-send");
+    btn.classList.add("is-stopping");
+    btn.setAttribute("aria-label", "ചാറ്റ് നിർത്തുക");
+    btn.setAttribute("title", "ചാറ്റ് നിർത്തുക");
+  } else if (hasText) {
+    stopIcon.style.display = "none";
+    arrowIcon.style.display = "block";
+    btn.classList.remove("is-stopping");
+    btn.classList.add("ready-send");
+    btn.setAttribute("aria-label", "അയയ്ക്കുക");
+    btn.setAttribute("title", "അയയ്ക്കുക");
+  } else {
+    stopIcon.style.display = "block";
+    arrowIcon.style.display = "none";
+    btn.classList.remove("is-stopping", "ready-send");
+    btn.setAttribute("aria-label", "സ്റ്റോപ്പ്");
+    btn.setAttribute("title", "സ്റ്റോപ്പ്");
+  }
+}
+
+function stopGeneration() {
+  currentRunToken++;
+
+  if (chatRunAbortController) {
+    try { chatRunAbortController.abort(); } catch (e) {}
+    chatRunAbortController = null;
+  }
+
+  // Immediately abort every active fetch request
+  activeFetchControllers.forEach(ctrl => {
+    try { ctrl.abort(); } catch (e) {}
+  });
+  activeFetchControllers.clear();
+
+  const session = getCurrentSession();
+  let updatedAny = false;
+  session.turns.forEach(turn => {
+    if (turn.finalStatus === "loading") {
+      updatedAny = true;
+      turn.finalStatus = "stopped";
+      turn.finalBadge = "നിർത്തി";
+      Object.entries(turn.answers || {}).forEach(([key, m]) => {
+        if (m.status === "loading") {
+          m.status = "skipped";
+          const badgeEl = document.getElementById(`badge-${turn.id}-${key}`);
+          const bodyEl = document.getElementById(`body-${turn.id}-${key}`);
+          if (badgeEl) { badgeEl.className = "badge"; badgeEl.textContent = "നിർത്തി"; }
+          if (bodyEl) { bodyEl.innerHTML = `<div style="color:var(--muted);font-size:14px;">നിർത്തി</div>`; }
+        }
+      });
+      updateTurnFinalUI(turn, false);
+    }
+  });
+
+  // Safety sweep: ensure zero Thinking animations remain visible in the DOM
+  document.querySelectorAll("#chatThread .thinking-row").forEach(el => {
+    const parent = el.parentElement;
+    if (parent) {
+      parent.innerHTML = `<div style="color:var(--muted);font-size:15px;">മറുപടി നിർത്തി.</div>`;
+    } else {
+      el.remove();
+    }
+  });
+
+  if (updatedAny) {
+    saveCurrentSession(session);
+  }
+
+  state.isRunning = false;
+  updateSendButtonState();
 }
 
 function handlePrimaryAction() {
-  const text = document.getElementById("promptInput").value.trim();
-  if (text) sendMessage();
-  else toggleVoice();
-}
-
-/* Voice Input */
-function toggleVoice() {
-  stopSpeaking();
-  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRec) return showToast("ഈ ബ്രൗസറിൽ വോയ്‌സ് ടൈപ്പിംഗ് ലഭ്യമല്ല");
-
-  const micBtn = document.getElementById("micBtn");
-  if (isListening && recognition) {
-    recognition.stop();
+  if (state.isRunning || hasActiveThinkingUI()) {
+    stopGeneration();
     return;
   }
-
-  recognition = new SpeechRec();
-  recognition.lang = state.mlOnly ? "ml-IN" : "en-IN";
-  recognition.interimResults = false;
-  recognition.maxAlternatives = 1;
-
-  recognition.onstart = () => {
-    isListening = true;
-    micBtn.classList.add("recording");
-    showToast("സംസാരിക്കൂ...");
-  };
-  recognition.onresult = (e) => {
-    const spoken = e.results[0][0].transcript;
-    const ta = document.getElementById("promptInput");
-    ta.value = (ta.value ? ta.value + " " : "") + spoken;
-    ta.focus();
-    ta.dispatchEvent(new Event("input"));
-  };
-  recognition.onerror = () => showToast("വോയ്‌സ് തിരിച്ചറിയാനായില്ല");
-  recognition.onend = () => {
-    isListening = false;
-    micBtn.classList.remove("recording");
-  };
-  recognition.start();
+  const text = document.getElementById("promptInput").value.trim();
+  if (text) sendMessage();
 }
 
 /* Sessions & Navigation */
 function getCurrentSession() {
-  if (state.incognito && state.tempSession) return state.tempSession;
   let s = state.sessions.find(x => x.id === state.currentSessionId);
   if (!s) s = createFreshSession();
   return s;
@@ -1667,13 +2526,11 @@ function getCurrentSession() {
 
 function createFreshSession() {
   const s = { id: "chat_" + Date.now(), title: "പുതിയ ചാറ്റ്", updatedAt: new Date().toLocaleString("ml-IN"), turns: [] };
-  if (state.incognito) state.tempSession = s;
-  else state.currentSessionId = s.id;
+  state.currentSessionId = s.id;
   return s;
 }
 
 function saveCurrentSession(session) {
-  if (state.incognito) return;
   session.updatedAt = new Date().toLocaleString("ml-IN");
   const idx = state.sessions.findIndex(x => x.id === session.id);
   if (idx >= 0) state.sessions.splice(idx, 1);
@@ -1684,22 +2541,10 @@ function saveCurrentSession(session) {
 }
 
 function startNewChat() {
-  if (state.isRunning) return showToast("ഇപ്പോഴത്തെ ഉത്തരം പൂർത്തിയാകട്ടെ...");
+  if (state.isRunning || hasActiveThinkingUI()) stopGeneration();
   stopSpeaking();
   createFreshSession();
   renderChatThread();
-  showToast("പുതിയ ചാറ്റ്");
-}
-
-function toggleIncognito() {
-  if (state.isRunning) return showToast("ഇപ്പോഴത്തെ ഉത്തരം പൂർത്തിയാകട്ടെ...");
-  stopSpeaking();
-  state.incognito = !state.incognito;
-  document.getElementById("ghostBtn").classList.toggle("ghost-active", state.incognito);
-  document.getElementById("incognitoBadge").style.display = state.incognito ? "inline-block" : "none";
-  createFreshSession();
-  renderChatThread();
-  showToast(state.incognito ? "പ്രൈവറ്റ് ചാറ്റ് ഓൺ (സേവ് ആകില്ല)" : "സാധാരണ ചാറ്റിലേക്ക് മാറി");
 }
 
 function toggleDrawer(open) {
@@ -1745,19 +2590,28 @@ function updateModelPillLabel() {
   const activeCount = state.models.filter(m => m.enabled).length;
   const synthObj = state.models.find(m => m.id === state.synthModelId) || state.models[0];
   const shortName = synthObj ? synthObj.name : "Multi-AI";
-  document.getElementById("modelPillLabel").textContent = state.multiMode
-    ? `${activeCount} AI · ${shortName}`
-    : `Smart · ${shortName}`;
+  if (state.multiMode) {
+    document.getElementById("modelPillLabel").textContent = `${activeCount} AI · സംഗ്രഹം`;
+  } else if (state.autoRoute) {
+    document.getElementById("modelPillLabel").textContent = "Auto · Smart Router";
+  } else {
+    document.getElementById("modelPillLabel").textContent = `Manual · ${shortName}`;
+  }
 }
 
 function saveQuickPrefs() {
+  state.autoRoute = document.getElementById("autoRouteToggle").checked;
   state.mlOnly = document.getElementById("mlOnlyToggle").checked;
+  state.autoPolish = document.getElementById("autoPolishToggle").checked;
   state.multiMode = document.getElementById("multiModeToggle").checked;
   state.synthModelId = document.getElementById("synthModelSelect").value;
+  localStorage.setItem("mai_auto_route", String(state.autoRoute));
   localStorage.setItem("mai_ml_only", String(state.mlOnly));
+  localStorage.setItem("mai_auto_polish", String(state.autoPolish));
   localStorage.setItem("mai_multi_mode", String(state.multiMode));
   localStorage.setItem("mai_synth_id_v2", state.synthModelId);
   updateModelPillLabel();
+  if (getCurrentSession().turns.length === 0) renderChatThread();
 }
 
 /* Chat Rendering */
@@ -1768,15 +2622,19 @@ function renderChatThread() {
 
   if (session.turns.length === 0) {
     thread.classList.remove("has-turns");
-    headerCenter.classList.toggle("visible", state.incognito);
+    headerCenter.classList.remove("visible");
     const activeCount = state.models.filter(m => m.enabled).length;
+    const modeLabel = state.multiMode
+      ? `${activeCount} Multi-AI`
+      : (state.autoRoute ? "Auto Smart Router" : "Manual Fallback");
     thread.innerHTML = `
       <div class="welcome-wrap">
         <div class="secret-trigger" onclick="handleSecretTap()">${getAvatarHtml("av-welcome")}</div>
         <h1 class="greeting-title">${escapeHtml(getGreetingText())}</h1>
+        <div class="greeting-sub"><span>Have a nice day</span><span class="wave-hand" aria-hidden="true">👋</span></div>
         <div class="dev-credit">Developed by <span>Shamsu shaz</span></div>
         <button class="plan-pill dev-only-inline" onclick="openQuickSheet()">
-          <span>${state.multiMode ? `${activeCount} Multi-AI` : "Smart Fallback"}</span> · <strong>Settings</strong>
+          <span>${modeLabel}</span> · <strong>Settings</strong>
         </button>
       </div>`;
     updateSideFloatActions();
@@ -1797,13 +2655,15 @@ function renderFinalInnerHtml(turn) {
     return THINKING_HTML;
   }
 
-  const finalStatusClass = turn.finalStatus === "done" ? "done" : "fail";
+  const finalStatusClass = turn.finalStatus === "done" ? "done" : (turn.finalStatus === "stopped" ? "" : "fail");
   const rawNote = turn.finalRawError
     ? `<div class="error-detail-note">${escapeHtml(turn.finalRawError)}</div>`
     : "";
   const finalBodyHtml = turn.finalStatus === "done"
     ? renderMarkdown(turn.finalText)
-    : `<div style="color:var(--red);">${escapeHtml(turn.finalError || "ഉത്തരം ലഭിച്ചില്ല")}</div>${rawNote}`;
+    : (turn.finalStatus === "stopped"
+      ? `<div style="color:var(--muted);font-size:15px;">മറുപടി നിർത്തി.</div>`
+      : `<div style="color:var(--red);">${escapeHtml(turn.finalError || "ഉത്തരം ലഭിച്ചില്ല")}</div>${rawNote}`);
 
   return `
     <div class="final-head">
@@ -1815,9 +2675,16 @@ function renderFinalInnerHtml(turn) {
     <div class="ai-body" id="final-body-${turn.id}">${finalBodyHtml}</div>`;
 }
 
-function updateTurnFinalUI(turn) {
+function updateTurnFinalUI(turn, animate = true) {
   const el = document.getElementById(`final-wrap-${turn.id}`);
-  if (el) el.innerHTML = renderFinalInnerHtml(turn);
+  if (el) {
+    el.innerHTML = renderFinalInnerHtml(turn);
+    if (animate && turn.finalStatus === "done") {
+      el.classList.remove("fresh-reveal");
+      void el.offsetWidth;
+      el.classList.add("fresh-reveal");
+    }
+  }
   updateSideFloatActions();
 }
 
@@ -1834,9 +2701,9 @@ function buildTurnElement(turn, openDetailsDefault) {
     const bodyHtml = m.status === "done"
       ? renderMarkdown(m.text)
       : (m.status === "fail"
-        ? `<div style="color:var(--red);font-size:14px;">${escapeHtml(m.error || "പരാജയപ്പെട്ടു")}</div>`
+        ? `<div style="color:var(--red);font-size:15px;">${escapeHtml(m.error || "പരാജയപ്പെട്ടു")}</div>`
         : (m.status === "skipped"
-          ? `<div style="color:var(--muted);font-size:13px;">Smart Mode — ആവശ്യമായില്ല</div>`
+          ? `<div style="color:var(--muted);font-size:14px;">Auto-Router — ആവശ്യമായില്ല</div>`
           : THINKING_HTML));
     cardsHtml += `
       <div class="ai-card">
@@ -1866,10 +2733,24 @@ function buildTurnElement(turn, openDetailsDefault) {
   return wrap;
 }
 
-/* API Worker Call */
-async function callWorker(modelId, messages, timeoutMs = 60000) {
+/* Fast API Worker Call with Instant User Abort Tracking */
+async function callWorker(modelId, messages, timeoutMs = 26000, temp = 0.25, maxTokens = 650, externalSignal = null) {
   const ctrl = new AbortController();
+  activeFetchControllers.add(ctrl);
   const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+  const onExternalAbort = () => ctrl.abort();
+
+  if (externalSignal) {
+    if (externalSignal.aborted) {
+      clearTimeout(timer);
+      activeFetchControllers.delete(ctrl);
+      const err = new Error("ABORTED_BY_USER");
+      err.isUserAbort = true;
+      throw err;
+    }
+    externalSignal.addEventListener("abort", onExternalAbort, { once: true });
+  }
+
   try {
     const headers = { "Content-Type": "application/json" };
     if (state.pin) headers["X-App-Pin"] = state.pin;
@@ -1877,7 +2758,13 @@ async function callWorker(modelId, messages, timeoutMs = 60000) {
     const res = await fetch(state.workerUrl, {
       method: "POST",
       headers,
-      body: JSON.stringify({ model: modelId, messages }),
+      body: JSON.stringify({
+        model: modelId,
+        messages,
+        temperature: temp,
+        top_p: 0.85,
+        max_tokens: maxTokens
+      }),
       signal: ctrl.signal
     });
     const textRaw = await res.text();
@@ -1892,26 +2779,98 @@ async function callWorker(modelId, messages, timeoutMs = 60000) {
     }
     const text = cleanMalayalamText(data.content || "");
     if (!text) throw new Error("ശൂന്യമായ ഉത്തരം ലഭിച്ചു");
+    markModelHealthy(modelId);
     return text;
   } catch (err) {
+    if (externalSignal && externalSignal.aborted) {
+      const abortErr = new Error("ABORTED_BY_USER");
+      abortErr.isUserAbort = true;
+      throw abortErr;
+    }
+    markModelFailed(modelId);
     if (err.name === "AbortError") throw new Error("സമയം കഴിഞ്ഞു (Timeout)");
     throw err;
-  } finally { clearTimeout(timer); }
+  } finally {
+    clearTimeout(timer);
+    activeFetchControllers.delete(ctrl);
+    if (externalSignal) externalSignal.removeEventListener("abort", onExternalAbort);
+  }
 }
 
-const wait = (ms) => new Promise(r => setTimeout(r, ms));
+/* Automatic Pure Malayalam Polisher (Runs ONLY on genuinely corrupted outputs) */
+async function polishToPureMalayalam(question, rawAnswer, preferredModelId, externalSignal = null) {
+  const polisher = getBestMalayalamPolisherModel();
+  const candidates = [
+    polisher ? polisher.id : "",
+    preferredModelId || ""
+  ].filter((id, i, arr) => id && arr.indexOf(id) === i);
+
+  const sanitizedDraft = safeSanitizeMalayalam(rawAnswer);
+  const prompt = [{
+    role: "user",
+    content: `താഴെയുള്ള ഉത്തരം അക്ഷരത്തെറ്റില്ലാത്ത ശുദ്ധവും ചുരുങ്ങിയതുമായ മലയാളത്തിലേക്ക് തിരുത്തി എഴുതുക. വസ്തുതകളും \`\`\` കോഡുകളും മാറ്റരുത്. ഉത്തരം മാത്രം നൽകുക.\n\nചോദ്യം: ${question}\n\nഉത്തരം:\n${sanitizedDraft}`
+  }];
+
+  const origScore = getMalayalamGlitchScore(rawAnswer);
+  for (const cid of candidates) {
+    if (externalSignal && externalSignal.aborted) break;
+    try {
+      const refined = await callWorker(cid, prompt, 24000, 0.15, 700, externalSignal);
+      const cleaned = safeSanitizeMalayalam(refined);
+      const newScore = getMalayalamGlitchScore(cleaned);
+      if (cleaned && newScore <= origScore && !isMostlyEnglishInsteadOfMalayalam(cleaned)) {
+        return { text: cleaned, polished: true, glitches: newScore };
+      }
+    } catch (e) {
+      if (e && e.isUserAbort) break;
+    }
+  }
+
+  return { text: sanitizedDraft, polished: false, glitches: getMalayalamGlitchScore(sanitizedDraft) };
+}
+
+const wait = (ms, signal = null) => new Promise((resolve) => {
+  if (signal && signal.aborted) return resolve();
+  const t = setTimeout(() => {
+    if (signal) signal.removeEventListener("abort", onAbort);
+    resolve();
+  }, ms);
+  const onAbort = () => {
+    clearTimeout(t);
+    resolve();
+  };
+  if (signal) signal.addEventListener("abort", onAbort, { once: true });
+});
+
+function buildTrimmedContext(recentTurns) {
+  const msgs = [];
+  recentTurns.forEach((t, idx) => {
+    const isMostRecent = idx === recentTurns.length - 1;
+    const maxReplyChars = isMostRecent ? 1200 : 550;
+    const replyText = t.finalText.length > maxReplyChars
+      ? t.finalText.slice(0, maxReplyChars) + "..."
+      : t.finalText;
+    msgs.push({ role: "user", content: t.question });
+    msgs.push({ role: "assistant", content: replyText });
+  });
+  return msgs;
+}
 
 async function sendMessage() {
   if (state.isRunning) return;
   stopSpeaking();
+
   const input = document.getElementById("promptInput");
   const question = input.value.trim();
   const activeModels = state.models.filter(m => m.enabled);
   if (!question) return;
   if (activeModels.length === 0) return showToast("കുറഞ്ഞത് ഒരു മോഡലെങ്കിലും തിരഞ്ഞെടുക്കുക");
 
+  const myRunToken = ++currentRunToken;
+  chatRunAbortController = new AbortController();
+  const runSignal = chatRunAbortController.signal;
+
   state.isRunning = true;
-  document.getElementById("sendBtn").disabled = true;
   input.value = "";
   input.style.height = "auto";
   updateSendButtonState();
@@ -1920,22 +2879,9 @@ async function sendMessage() {
   if (session.turns.length === 0) session.title = question.slice(0, 48);
 
   const recentTurns = session.turns.filter(t => t.finalStatus === "done" && t.finalText).slice(-MAX_CONTEXT_TURNS);
-  const baseMessages = [];
-  recentTurns.forEach(t => {
-    baseMessages.push({ role: "user", content: t.question });
-    baseMessages.push({ role: "assistant", content: t.finalText });
-  });
-
-  const userContent = state.mlOnly
-    ? `${question}\n\n[നിർദ്ദേശം: ശുദ്ധവും സ്വാഭാവികവുമായ മലയാളത്തിൽ മാത്രം മറുപടി നൽകുക. മലയാളം വാക്കുകൾക്കിടയിൽ ഇംഗ്ലീഷ് അക്ഷരങ്ങളോ മറ്റ് വിദേശ ഭാഷകളിലെ അക്ഷരങ്ങളോ കലർത്തരുത്. അക്ഷരത്തെറ്റും ചിഹ്നങ്ങളിലെ അകലവും പാടില്ല.]`
-    : question;
-  baseMessages.push({ role: "user", content: userContent });
-
-  const orderedModels = [...activeModels].sort((a, b) => {
-    if (a.id === state.synthModelId) return -1;
-    if (b.id === state.synthModelId) return 1;
-    return 0;
-  });
+  const baseMessages = buildTrimmedContext(recentTurns);
+  const { routeInfo, orderedModels } = getOrderedModelsForQuestion(activeModels, question);
+  baseMessages.push({ role: "user", content: buildPromptSuffix(question, routeInfo) });
 
   const turn = {
     id: Date.now(),
@@ -1967,155 +2913,217 @@ async function sendMessage() {
   thread.appendChild(buildTurnElement(turn, false));
   scrollToBottom();
 
-  if (!state.multiMode) {
-    /* SMART AUTO-FALLBACK MODE */
-    let bestAnswer = null;
-    const errors = [];
+  const reqTimeout = routeInfo.timeoutMs || 25000;
+  const maxTokens = routeInfo.maxTokens || 650;
+  const isAborted = () => myRunToken !== currentRunToken || runSignal.aborted;
 
-    for (const m of orderedModels) {
-      const start = Date.now();
-      const badgeEl = document.getElementById(`badge-${turn.id}-${m.key}`);
-      const bodyEl = document.getElementById(`body-${turn.id}-${m.key}`);
-      turn.answers[m.key].status = "loading";
-      if (badgeEl) { badgeEl.className = "badge loading"; badgeEl.textContent = "..."; }
-      if (bodyEl) { bodyEl.innerHTML = THINKING_HTML; }
+  try {
+    if (!state.multiMode) {
+      /* FAST SINGLE-PASS SMART ROUTER */
+      let bestAnswer = null;
+      const errors = [];
+      const totalStart = Date.now();
+      let successfulTries = 0;
 
-      try {
-        const reply = await callWorker(m.id, baseMessages);
-        const sec = ((Date.now() - start) / 1000).toFixed(1);
-        const glitches = state.mlOnly ? getMalayalamGlitchScore(reply) : 0;
+      for (const m of orderedModels) {
+        if (isAborted()) return;
+        const start = Date.now();
+        const badgeEl = document.getElementById(`badge-${turn.id}-${m.key}`);
+        const bodyEl = document.getElementById(`body-${turn.id}-${m.key}`);
+        turn.answers[m.key].status = "loading";
+        if (badgeEl) { badgeEl.className = "badge loading"; badgeEl.textContent = "..."; }
+        if (bodyEl) { bodyEl.innerHTML = THINKING_HTML; }
 
-        turn.answers[m.key] = { ...turn.answers[m.key], status: "done", text: reply, sec };
-        if (badgeEl) { badgeEl.className = "badge done"; badgeEl.textContent = `${sec}s`; }
-        if (bodyEl) { bodyEl.innerHTML = renderMarkdown(reply); }
-
-        if (!bestAnswer || glitches < bestAnswer.glitches) {
-          bestAnswer = { text: reply, glitches, name: m.name, sec };
+        let reply = null;
+        let lastErr = null;
+        try {
+          reply = await callWorker(m.id, baseMessages, reqTimeout, 0.25, maxTokens, runSignal);
+        } catch (err) {
+          if (err && err.isUserAbort) return;
+          lastErr = err;
         }
-        if (glitches <= 3) break;
-      } catch (err) {
-        errors.push(`${m.name}: ${err.message}`);
-        turn.answers[m.key] = { ...turn.answers[m.key], status: "fail", error: err.message };
-        if (badgeEl) { badgeEl.className = "badge fail"; badgeEl.textContent = "പരാജയം"; }
-        if (bodyEl) { bodyEl.innerHTML = `<div style="color:var(--red);font-size:14px;">${escapeHtml(err.message)}</div>`; }
 
-        const lowErr = err.message.toLowerCase();
-        if (lowErr.includes("free-models-per-day") || lowErr.includes("401")) break;
+        if (isAborted()) return;
+
+        if (reply) {
+          successfulTries++;
+          const sec = ((Date.now() - start) / 1000).toFixed(1);
+          const cleanBody = cleanMalayalamText(reply);
+          const glitches = state.mlOnly ? getMalayalamGlitchScore(cleanBody) : 0;
+          const tooEnglish = state.mlOnly && isMostlyEnglishInsteadOfMalayalam(cleanBody);
+          const totalScore = glitches + (tooEnglish ? 25 : 0);
+
+          turn.answers[m.key] = { ...turn.answers[m.key], status: "done", text: cleanBody, sec };
+          if (badgeEl) {
+            badgeEl.className = totalScore < 15 ? "badge done" : "badge loading";
+            badgeEl.textContent = `${sec}s`;
+          }
+          if (bodyEl) { bodyEl.innerHTML = renderMarkdown(cleanBody); }
+
+          if (!bestAnswer || totalScore < bestAnswer.totalScore) {
+            bestAnswer = { text: cleanBody, glitches, totalScore, name: m.name, id: m.id, sec };
+          }
+
+          if (totalScore < 15 || successfulTries >= 2) break;
+        } else if (lastErr) {
+          errors.push(`${m.name}: ${lastErr.message}`);
+          turn.answers[m.key] = { ...turn.answers[m.key], status: "fail", error: lastErr.message };
+          if (badgeEl) { badgeEl.className = "badge fail"; badgeEl.textContent = "പരാജയം"; }
+          if (bodyEl) { bodyEl.innerHTML = `<div style="color:var(--red);font-size:15px;">${escapeHtml(lastErr.message)}</div>`; }
+
+          const lowErr = lastErr.message.toLowerCase();
+          if (lowErr.includes("free-models-per-day") || lowErr.includes("401")) break;
+        }
       }
-    }
 
-    if (bestAnswer) {
-      turn.finalStatus = "done";
-      turn.finalBadge = `${bestAnswer.name} · ${bestAnswer.sec}s`;
-      turn.finalText = cleanMalayalamText(bestAnswer.text);
-    } else {
-      const diag = formatFriendlyError(errors);
-      turn.finalStatus = "fail";
-      turn.finalBadge = "പരാജയപ്പെട്ടു";
-      turn.finalError = diag.title;
-      turn.finalRawError = diag.raw;
-    }
-    updateTurnFinalUI(turn);
-  } else {
-    /* MULTI-AI SYNTHESIS MODE */
-    const errors = [];
-    const tasks = orderedModels.map(async (m, idx) => {
-      if (idx > 0) await wait(idx * 350);
-      const start = Date.now();
-      const badgeEl = document.getElementById(`badge-${turn.id}-${m.key}`);
-      const bodyEl = document.getElementById(`body-${turn.id}-${m.key}`);
-      try {
-        const reply = await callWorker(m.id, baseMessages);
-        const sec = ((Date.now() - start) / 1000).toFixed(1);
-        turn.answers[m.key] = { ...turn.answers[m.key], status: "done", text: reply, sec };
-        if (badgeEl) { badgeEl.className = "badge done"; badgeEl.textContent = `${sec}s`; }
-        if (bodyEl) { bodyEl.innerHTML = renderMarkdown(reply); }
-      } catch (err) {
-        errors.push(`${m.name}: ${err.message}`);
-        turn.answers[m.key] = { ...turn.answers[m.key], status: "fail", error: err.message };
-        if (badgeEl) { badgeEl.className = "badge fail"; badgeEl.textContent = "പരാജയം"; }
-        if (bodyEl) { bodyEl.innerHTML = `<div style="color:var(--red);font-size:14px;">${escapeHtml(err.message)}</div>`; }
-      }
-    });
+      if (isAborted()) return;
 
-    await Promise.allSettled(tasks);
-    const successList = Object.values(turn.answers).filter(a => a.status === "done");
+      if (bestAnswer) {
+        let finalText = cleanMalayalamText(bestAnswer.text);
+        let polishedTag = "";
 
-    if (successList.length === 0) {
-      const diag = formatFriendlyError(errors);
-      turn.finalStatus = "fail";
-      turn.finalBadge = "പരാജയപ്പെട്ടു";
-      turn.finalError = diag.title;
-      turn.finalRawError = diag.raw;
-      updateTurnFinalUI(turn);
-    } else {
-      const gemmaModel = state.models.find(m => m.id.toLowerCase().includes("gemma") || m.id.toLowerCase().includes("gemini"));
-      const sortedByPurity = [...successList].sort((a, b) => getMalayalamGlitchScore(a.text) - getMalayalamGlitchScore(b.text));
-      const fallbackIds = [
-        state.synthModelId,
-        gemmaModel ? gemmaModel.id : "",
-        ...sortedByPurity.map(s => s.id)
-      ].filter((id, i, arr) => id && arr.indexOf(id) === i).slice(0, 2);
+        if (state.mlOnly && state.autoPolish && bestAnswer.totalScore >= 15) {
+          const polished = await polishToPureMalayalam(question, finalText, bestAnswer.id, runSignal);
+          if (isAborted()) return;
+          finalText = polished.text;
+          if (polished.polished) polishedTag = " + ശുദ്ധമലയാളം";
+        }
 
-      if (successList.length === 1) {
+        if (state.mlOnly) {
+          finalText = safeSanitizeMalayalam(finalText);
+        }
+
+        const totalSec = ((Date.now() - totalStart) / 1000).toFixed(1);
         turn.finalStatus = "done";
-        turn.finalBadge = successList[0].name;
-        turn.finalText = cleanMalayalamText(successList[0].text);
-        updateTurnFinalUI(turn);
+        turn.finalBadge = `${routeInfo.label} · ${bestAnswer.name}${polishedTag} · ${totalSec}s`;
+        turn.finalText = finalText;
+        updateTurnFinalUI(turn, true);
       } else {
-        await wait(600);
-        const combined = successList.map(a => `### ${a.name}:\n${a.text}`).join("\n\n---\n\n");
-        const pastContextText = recentTurns.length > 0
-          ? "Previous Context:\n" + recentTurns.slice(-3).map(t => `User: ${t.question}\nAssistant: ${t.finalText}`).join("\n\n") + "\n\n---\n\n"
-          : "";
-        const langRule = state.mlOnly
-          ? STRICT_ML_RULES
-          : "Write the final answer clearly in the same language as the user's question.";
-
-        const synthPrompt = [{
-          role: "user",
-          content: `You are an expert Malayalam editor and synthesis assistant. Read the AI answers below for the user's question and combine the most accurate, practical information into ONE clear, well-structured final answer. Fix any spelling mistakes or garbled characters from the source answers.\n\n${langRule}\n\n${pastContextText}Question:\n${question}\n\nAI Responses:\n${combined}`
-        }];
-
-        let bestResult = null;
-        const startAll = Date.now();
-        for (const candidateId of fallbackIds) {
-          try {
-            const reply = await callWorker(candidateId, synthPrompt);
-            const cleaned = cleanMalayalamText(reply);
-            const glitches = state.mlOnly ? getMalayalamGlitchScore(cleaned) : 0;
-            if (!bestResult || glitches < bestResult.glitches) {
-              bestResult = { text: cleaned, glitches };
-            }
-            if (glitches <= 3) break;
-          } catch (err) {}
-        }
-
-        if (bestResult) {
-          const sec = ((Date.now() - startAll) / 1000).toFixed(1);
-          turn.finalStatus = "done";
-          turn.finalBadge = `${successList.length} AI · ${sec}s`;
-          turn.finalText = bestResult.text;
-        } else {
-          turn.finalStatus = "done";
-          turn.finalBadge = `${sortedByPurity[0].name}`;
-          turn.finalText = cleanMalayalamText(sortedByPurity[0].text);
-        }
-        updateTurnFinalUI(turn);
+        const diag = formatFriendlyError(errors);
+        turn.finalStatus = "fail";
+        turn.finalBadge = "പരാജയപ്പെട്ടു";
+        turn.finalError = diag.title;
+        turn.finalRawError = diag.raw;
+        updateTurnFinalUI(turn, false);
       }
+    } else {
+      /* MULTI-AI SYNTHESIS MODE */
+      const errors = [];
+      const tasks = orderedModels.map(async (m, idx) => {
+        if (idx > 0) await wait(idx * 120, runSignal);
+        if (isAborted()) return;
+        const start = Date.now();
+        const badgeEl = document.getElementById(`badge-${turn.id}-${m.key}`);
+        const bodyEl = document.getElementById(`body-${turn.id}-${m.key}`);
+        try {
+          const raw = await callWorker(m.id, baseMessages, reqTimeout, 0.25, maxTokens, runSignal);
+          if (isAborted()) return;
+          const reply = cleanMalayalamText(raw);
+          const sec = ((Date.now() - start) / 1000).toFixed(1);
+          turn.answers[m.key] = { ...turn.answers[m.key], status: "done", text: reply, sec };
+          if (badgeEl) { badgeEl.className = "badge done"; badgeEl.textContent = `${sec}s`; }
+          if (bodyEl) { bodyEl.innerHTML = renderMarkdown(reply); }
+        } catch (err) {
+          if ((err && err.isUserAbort) || isAborted()) return;
+          errors.push(`${m.name}: ${err.message}`);
+          turn.answers[m.key] = { ...turn.answers[m.key], status: "fail", error: err.message };
+          if (badgeEl) { badgeEl.className = "badge fail"; badgeEl.textContent = "പരാജയം"; }
+          if (bodyEl) { bodyEl.innerHTML = `<div style="color:var(--red);font-size:15px;">${escapeHtml(err.message)}</div>`; }
+        }
+      });
+
+      await Promise.allSettled(tasks);
+      if (isAborted()) return;
+
+      const successList = Object.values(turn.answers).filter(a => a.status === "done");
+
+      if (successList.length === 0) {
+        const diag = formatFriendlyError(errors);
+        turn.finalStatus = "fail";
+        turn.finalBadge = "പരാജയപ്പെട്ടു";
+        turn.finalError = diag.title;
+        turn.finalRawError = diag.raw;
+        updateTurnFinalUI(turn, false);
+      } else {
+        const polisher = getBestMalayalamPolisherModel();
+        const sortedByPurity = [...successList].sort((a, b) => getMalayalamGlitchScore(a.text) - getMalayalamGlitchScore(b.text));
+        const fallbackIds = [
+          polisher ? polisher.id : "",
+          state.synthModelId,
+          ...sortedByPurity.map(s => s.id)
+        ].filter((id, i, arr) => id && arr.indexOf(id) === i).slice(0, 2);
+
+        if (successList.length === 1) {
+          let singleText = cleanMalayalamText(successList[0].text);
+          if (state.mlOnly && getMalayalamGlitchScore(singleText) >= 15) {
+            const p = await polishToPureMalayalam(question, singleText, successList[0].id, runSignal);
+            if (isAborted()) return;
+            singleText = p.text;
+          }
+          turn.finalStatus = "done";
+          turn.finalBadge = `${routeInfo.label} · ${successList[0].name}`;
+          turn.finalText = state.mlOnly ? safeSanitizeMalayalam(singleText) : singleText;
+        } else {
+          const combined = successList.map(a => `### ${a.name}:\n${safeSanitizeMalayalam(a.text)}`).join("\n\n---\n\n");
+          const synthPrompt = [{
+            role: "user",
+            content: `താഴെയുള്ള ഉത്തരങ്ങളിലെ ഏറ്റവും കൃത്യമായ വിവരങ്ങൾ ചേർത്ത് മിതമായ നീളത്തിൽ ഒരു ചുരുങ്ങിയ ഉത്തരം തയ്യാറാക്കുക. അവസാനം 1 വരിയിൽ **ചുരുക്കം:**, 1-2 ചെറിയ പോയിന്റിൽ **ടിപ്പുകൾ:** ചേർക്കുക.\n${state.mlOnly ? STRICT_ML_RULES : "Write clearly and concisely."}\n\nചോദ്യം: ${question}\n\nഉത്തരങ്ങൾ:\n${combined}`
+          }];
+
+          let bestResult = null;
+          const startAll = Date.now();
+          for (const candidateId of fallbackIds) {
+            if (isAborted()) return;
+            try {
+              const reply = await callWorker(candidateId, synthPrompt, reqTimeout, 0.2, maxTokens, runSignal);
+              if (isAborted()) return;
+              const cleaned = state.mlOnly ? safeSanitizeMalayalam(reply) : cleanMalayalamText(reply);
+              const glitches = state.mlOnly ? getMalayalamGlitchScore(cleaned) : 0;
+              if (!bestResult || glitches < bestResult.glitches) {
+                bestResult = { text: cleaned, glitches };
+              }
+              if (glitches < 15) break;
+            } catch (err) {
+              if (err && err.isUserAbort) return;
+            }
+          }
+
+          if (isAborted()) return;
+
+          if (bestResult) {
+            const sec = ((Date.now() - startAll) / 1000).toFixed(1);
+            turn.finalStatus = "done";
+            turn.finalBadge = `${routeInfo.label} · ${successList.length} AI · ${sec}s`;
+            turn.finalText = bestResult.text;
+          } else {
+            turn.finalStatus = "done";
+            turn.finalBadge = `${routeInfo.label} · ${sortedByPurity[0].name}`;
+            turn.finalText = state.mlOnly ? safeSanitizeMalayalam(sortedByPurity[0].text) : cleanMalayalamText(sortedByPurity[0].text);
+          }
+        }
+
+        updateTurnFinalUI(turn, true);
+      }
+    }
+
+    if (isAborted()) return;
+    saveCurrentSession(session);
+    scrollToBottom();
+  } finally {
+    if (myRunToken === currentRunToken) {
+      chatRunAbortController = null;
+      state.isRunning = false;
+      updateSendButtonState();
     }
   }
-
-  saveCurrentSession(session);
-  scrollToBottom();
-  state.isRunning = false;
-  document.getElementById("sendBtn").disabled = false;
 }
 
 /* Modals & Settings (Developer Only) */
 function openQuickSheet() {
   if (!state.devMode) return;
+  document.getElementById("autoRouteToggle").checked = state.autoRoute;
   document.getElementById("mlOnlyToggle").checked = state.mlOnly;
+  document.getElementById("autoPolishToggle").checked = state.autoPolish;
   document.getElementById("multiModeToggle").checked = state.multiMode;
   renderModelControls();
   document.getElementById("quickSheet").style.display = "flex";
@@ -2124,7 +3132,6 @@ function openQuickSheet() {
 function openSettings() {
   if (!state.devMode) return;
   updateStaticAvatars();
-  document.getElementById("setUserName").value = state.userName;
   document.getElementById("setDevPin").value = state.devPin;
   document.getElementById("setWorkerUrl").value = state.workerUrl;
   document.getElementById("setWorkerPin").value = state.pin;
@@ -2142,8 +3149,6 @@ function renderModelSettings(list) {
 function applyPreset(type) { renderModelSettings(cloneObj(PRESETS[type])); }
 
 function saveSettings() {
-  const newName = document.getElementById("setUserName").value.trim();
-  if (newName) { state.userName = newName; localStorage.setItem("mai_username", newName); }
   const newDevPin = document.getElementById("setDevPin").value.trim();
   if (newDevPin) { state.devPin = newDevPin; localStorage.setItem("mai_dev_pin", newDevPin); }
   const newUrl = document.getElementById("setWorkerUrl").value.trim().replace(/\/$/, "");
@@ -2157,6 +3162,7 @@ function saveSettings() {
     return { key: inp.dataset.key, name: inp.dataset.name, id: inp.value.trim(), enabled: m.enabled };
   });
   localStorage.setItem("mai_models_v3", JSON.stringify(state.models));
+  modelCooldownUntil.clear();
   renderModelControls();
   if (getCurrentSession().turns.length === 0) renderChatThread();
   closeModal("settingsModal");
@@ -2168,7 +3174,7 @@ function renderHistoryList() {
   list.innerHTML = state.sessions.length === 0
     ? `<p style="color:var(--muted);text-align:center;padding:24px;font-size:14px;">സേവ് ചെയ്ത ചാറ്റുകളൊന്നുമില്ല.</p>`
     : state.sessions.map(s => `
-      <div class="history-item ${!state.incognito && s.id === state.currentSessionId ? "active-chat" : ""}">
+      <div class="history-item ${s.id === state.currentSessionId ? "active-chat" : ""}">
         <div class="history-main" onclick="loadSession('${s.id}')">
           <div class="history-q">${escapeHtml(s.title)}</div>
           <div class="history-meta">${escapeHtml(s.updatedAt)} • ${s.turns.length} ചോദ്യങ്ങൾ</div>
@@ -2178,11 +3184,8 @@ function renderHistoryList() {
 }
 
 function loadSession(id) {
-  if (state.isRunning) return showToast("ഇപ്പോഴത്തെ ഉത്തരം പൂർത്തിയാകട്ടെ...");
+  if (state.isRunning || hasActiveThinkingUI()) stopGeneration();
   stopSpeaking();
-  state.incognito = false;
-  document.getElementById("ghostBtn").classList.remove("ghost-active");
-  document.getElementById("incognitoBadge").style.display = "none";
   state.currentSessionId = id;
   renderChatThread();
   toggleDrawer(false);
@@ -2192,6 +3195,7 @@ function deleteSession(id) {
   state.sessions = state.sessions.filter(s => s.id !== id);
   localStorage.setItem("mai_sessions_v2", JSON.stringify(state.sessions));
   if (state.currentSessionId === id) {
+    if (state.isRunning || hasActiveThinkingUI()) stopGeneration();
     stopSpeaking();
     createFreshSession();
     renderChatThread();
@@ -2201,6 +3205,7 @@ function deleteSession(id) {
 
 function clearAllSessions() {
   if (!confirm("സേവ് ചെയ്ത എല്ലാ ചാറ്റുകളും മായ്ക്കണോ?")) return;
+  if (state.isRunning || hasActiveThinkingUI()) stopGeneration();
   stopSpeaking();
   state.sessions = [];
   localStorage.removeItem("mai_sessions_v2");
@@ -2236,6 +3241,7 @@ function renderMarkdown(text) {
     return `@@CODEBLOCK_${idx}@@`;
   });
   safe = safe.replace(/`([^`]+)`/g, "<code>$1</code>");
+  safe = safe.replace(/^\s*---+\s*$/gim, "<hr>");
   safe = safe.replace(/^### (.*$)/gim, "<h4>$1</h4>");
   safe = safe.replace(/^## (.*$)/gim, "<h3>$1</h3>");
   safe = safe.replace(/^# (.*$)/gim, "<h3>$1</h3>");
@@ -2245,7 +3251,7 @@ function renderMarkdown(text) {
   safe = safe.replace(/(<li>[\s\S]*?<\/li>)/g, "<ul>$1</ul>");
   safe = safe.replace(/<\/ul>\s*<ul>/g, "");
   safe = safe.replace(/\n/g, "<br>");
-  safe = safe.replace(/<br>(<\/?(?:h3|h4|ul|li)>)/g, "$1");
+  safe = safe.replace(/<br>(<\/?(?:h3|h4|ul|li|hr)>)/g, "$1");
   safe = safe.replace(/(<\/(?:h3|h4|ul|li)>)<br>/g, "$1");
   codeBlocks.forEach((block, idx) => { safe = safe.replace(`@@CODEBLOCK_${idx}@@`, block); });
   return safe;
