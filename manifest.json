@@ -1,25 +1,23 @@
 {
   "name": "Multi-AI Hub",
   "short_name": "Multi-AI",
-  "description": "അഞ്ച് AI മോഡലുകളുടെ ഉത്തരങ്ങൾ ഒരേസമയം താരതമ്യം ചെയ്ത് അന്തിമ ഉത്തരം നൽകുന്ന മലയാളം ചാറ്റ് ആപ്പ്",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#0d1117",
-  "theme_color": "#0d1117",
+  "background_color": "#faf9f5",
+  "theme_color": "#faf9f5",
   "icons": [
     {
-      "src": "./icon-192.png",
+      "src": "./icon.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "./icon-512.png",
+      "src": "./icon.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ]
 }
